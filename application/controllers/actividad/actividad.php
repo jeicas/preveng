@@ -278,6 +278,8 @@ class Actividad extends CI_Controller {
                     'fechaPA' => $row['fechaPA'],
                     'depende' => $depende,
                     'iddepende' => $idDepende,
+                    'meta' =>$row['meta'],
+                    'medida' =>$row['medida'],
                     'observacion' => $observacion,
                     'estatus' => $estatus,
                 );
@@ -336,6 +338,10 @@ class Actividad extends CI_Controller {
         $fecharegistro = date('Y-m-d');
         $fechaT = $this->input->post('dtfFechaT');
         $fechaPA = $this->input->post('dtfFechaPA');
+        $meta = $this->input->post('txtMeta');
+        $medida = $this->input->post('txtUnidad');
+
+
 
         $estatusEv = 1;
 
@@ -360,6 +366,8 @@ class Actividad extends CI_Controller {
                     'fechaaviso' => $fechaPA,
                     'fechatope' => $fechaT,
                     'actividadepende' => $depende,
+                    'meta' => $meta,
+                    'medida' => $medida,
                     'estatus' => $estatus,
                 );
 
@@ -385,6 +393,8 @@ class Actividad extends CI_Controller {
                 'fecharegistro' => $fecharegistro,
                 'fechaaviso' => $fechaPA,
                 'fechatope' => $fechaT,
+                'meta' => $meta,
+                'medida' => $medida,
                 'actividadepende' => $depende,
                 'estatus' => $estatus,
             );
@@ -402,7 +412,7 @@ class Actividad extends CI_Controller {
         if ($result and $resultEve) {
             echo json_encode(array(
                 "success" => true,
-                "msg" => "Se Guardo con Éxito." . $usuario //modificado en la base de datos
+                "msg" => "Se Guardo con Éxito." //modificado en la base de datos
             ));
         } else {
 
@@ -423,7 +433,8 @@ class Actividad extends CI_Controller {
         $fecharegistro = date('Y-m-d');
         $fechaT = $this->input->post('dtfFechaT');
         $fechaPA = $this->input->post('dtfFechaPA');
-
+        $meta = $this->input->post('txtMeta');
+        $medida = $this->input->post('txtUnidad');
 
         if ($this->input->post('cmbActividadDepende') == '' || $this->input->post('cmbActividadDepende') == null || $this->input->post('cmbActividadDepende') == 'Seleccione') {
             $depende = null;
@@ -436,6 +447,8 @@ class Actividad extends CI_Controller {
             'fecharegistro' => $fecharegistro,
             'fechaaviso' => $fechaPA,
             'fechatope' => $fechaT,
+            'meta' => $meta,
+            'medida' => $medida,
             'actividadepende' => $depende,
         );
 
@@ -701,13 +714,13 @@ class Actividad extends CI_Controller {
                 } else {
                     $descripcion = $row['actDescripcion'];
                 }
-                
-                 if ($row['fecha'] == 'NULL') {
+
+                if ($row['fecha'] == 'NULL') {
                     $fecha = '';
                 } else {
                     $fecha = $row['fecha'];
                 }
-                
+
                 $data[] = array(
                     'idAct' => $row['idAct'],
                     'actividad' => " Plan de Accion:" . $descripcion . " <br> <font color=#3F77E6> Estado: " . $estatus . "</font></br>",

@@ -96,7 +96,7 @@ class Comisionado extends CI_Controller {
                 'success' => true,
                 'cuanto' => $cuanto,
             );  
-            echo json_encode($output);
+            
         }  else {
             $output = array(
                 'success' => true,  

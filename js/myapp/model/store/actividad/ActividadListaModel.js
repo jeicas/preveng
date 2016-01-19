@@ -9,6 +9,8 @@ Ext.define('myapp.model.store.actividad.ActividadListaModel', {
         { name: 'depende'},
         { name: 'iddepende'},
         { name: 'evento'},
+         { name: 'meta'},
+        { name: 'medida'},
         { name: 'observacion'},
         { name: 'estatus'},
     ] 

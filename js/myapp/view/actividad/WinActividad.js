@@ -31,7 +31,7 @@ extend: 'Ext.window.Window',
                         xtype: 'fieldset',
                         x: 20,
                         y: 10,
-                        height: 130,
+                        height: 150,
                         width: 517,
                         layout: 'absolute',
                         title: '',
@@ -70,12 +70,30 @@ extend: 'Ext.window.Window',
                                 format:'Y-m-d',
                                 minValue: new Date(), //<-- min date is today
                                 value:new Date()
+                            }, 
+                             {
+                                xtype: 'numberfield',
+                                x: 10,
+                                y: 120,
+                                width: 220,
+                                fieldLabel: 'Meta:',
+                                name:'meta',
+                              
+                            }, 
+                             {
+                                xtype: 'textfield',
+                                x: 260,
+                                y: 120,
+                                width: 220,
+                                fieldLabel: 'U.de Medida',
+                                name:'medida',
+                               
                             }
                         ]
                     }, {
                         xtype: 'fieldset',
                         x: 20,
-                        y: 150,
+                        y: 170,
                         height: 80,
                         width: 517,
                         layout: 'absolute',

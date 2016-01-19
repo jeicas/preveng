@@ -174,11 +174,6 @@ class Avance extends CI_Controller {
             }
                     
         }
-        
-        
-        
-
-
         if ($result AND $resultad AND $resultFoto) {
             echo json_encode(array(
                 "success" => true,
@@ -192,8 +187,6 @@ class Avance extends CI_Controller {
             ));
         }
     }//registrarAvance
-    
-    
     
     
      public function asignarEmpleado() {
@@ -373,7 +366,7 @@ class Avance extends CI_Controller {
                 }
                 
                
-                $eventAct = "  Actividad: " . $row['actividad'] . "<br> <font color=#3F77E6> Evento: " . $row['evento'] . "</font></br>";
+                $eventAct = "<H3><font color=#3F77E6>  Actividad: " . $row['actividad']. "</font></H3> <br> Evento: " . $row['evento']."<br>" ;
 
                 $data[] = array(
                     'idAct' => $row['idActividad'],

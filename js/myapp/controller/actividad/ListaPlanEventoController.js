@@ -174,6 +174,8 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
                     params:
                             {
                                 txtDescripcion: win.down("textfield[name=descripcion]").getValue(),
+                                txtMeta: win.down("numberfield[name=meta]").getValue(),
+                                txtUnidad: win.down("textfield[name=medida]").getValue(),
                                 dtfFechaT: win.down("textfield[name=dtfFechaT]").getValue(),
                                 dtfFechaPA: win.down("textfield[name=dtfFechaPA]").getValue(),
                                 cmbActividadDepende: win.down("combobox[name=cmbActividadDepende]").getValue(),
@@ -232,6 +234,8 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
                                 txtDescripcion: win.down("textfield[name=descripcion]").getValue(),
                                 dtfFechaT: win.down("textfield[name=dtfFechaT]").getValue(),
                                 dtfFechaPA: win.down("textfield[name=dtfFechaPA]").getValue(),
+                                txtMeta: win.down("numberfield[name=meta]").getValue(),
+                                txtUnidad: win.down("textfield[name=medida]").getValue(),
                                 cmbActividadDepende: ActividadDependiente,
                             },
                     success: function (result, request) {
