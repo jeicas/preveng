@@ -48,7 +48,9 @@ Ext.define('myapp.view.evento.ListaEventosComisionados', {
         me.callParent();
     },
     buildColumns: function () {
-        return [
+        return [  {
+            xtype: 'rownumberer'
+        },
             {
                 dataIndex: 'idEv',
                 flex: 0.1,

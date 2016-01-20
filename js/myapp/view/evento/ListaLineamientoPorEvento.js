@@ -18,7 +18,9 @@ Ext.define('myapp.view.evento.ListaLineamientoPorEvento', {
         me.callParent();
     },
     buildColumns: function () {
-        return [ {
+        return [   {
+            xtype: 'rownumberer'
+        },{
                 dataIndex: 'idLin',
                 hidden: true,
                 flex: 0.2,

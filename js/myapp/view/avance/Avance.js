@@ -68,7 +68,24 @@ Ext.define('myapp.view.registrar.Avance', {
                             fieldLabel: 'Costo:',
                             minLength:2,
                             maxLength:10
-                        }
+                        },
+                         {
+                            xtype: 'textfield',
+                            width: 150,
+                            name: 'txtmetalograda',
+                            fieldLabel: 'Meta Lograda:',
+                            x: 0,
+                            y: 120,
+                        },
+                          {
+                            xtype: 'label',
+                            x: 160,
+                            y: 130,
+                            name:'lblUnidad',
+                            id:'lblUnidad',
+                            text: 'unidades'
+                        },
+                        
                     ]
                 },
                 {
@@ -122,6 +139,23 @@ Ext.define('myapp.view.registrar.Avance', {
                             id:'lblFechaAsignacion',
                             text: ''
                         },
+                        {
+                            xtype: 'label',
+                            x: 20,
+                            y: 100,
+                            name:'lblTitleMeta',
+                            id:'lblTitleMeta',
+                            text: 'Meta:'
+                        },
+                        {
+                            xtype: 'label',
+                            x: 60,
+                            y: 100,
+                            name:'lblMeta',
+                            id:'lblMeta',
+                            text: ''
+                        },
+                       
                         {
                     xtype: 'radiogroup',
                      x: 10,

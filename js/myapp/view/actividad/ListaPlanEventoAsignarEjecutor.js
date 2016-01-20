@@ -16,7 +16,8 @@ Ext.define('myapp.view.actividad.ListaPlanEventoAsignarEjecutor', {
             summaryType: 'count',
             groupHeaderTpl: '<font size=2><font size=2>{name}</font>',
             hideGroupedHeader: true,
-            enableGroupingMenu: false
+            enableGroupingMenu: false, 
+            startCollapsed : true
        }],
     store: Ext.create('myapp.store.actividad.PlandeAccionStore'),
    viewConfig: {
@@ -59,6 +60,9 @@ Ext.define('myapp.view.actividad.ListaPlanEventoAsignarEjecutor', {
     },
     buildColumns: function () {
         return [
+              {
+            xtype: 'rownumberer'
+        },
             {
                 dataIndex: 'idEvento',
                 flex: 1.5,

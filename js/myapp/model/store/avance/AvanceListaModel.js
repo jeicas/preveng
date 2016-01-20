@@ -19,6 +19,7 @@ Ext.define('myapp.model.store.avance.AvanceListaModel', {
         { name: 'observacion'},
          { name: 'anexo'},
         { name: 'direccion'},
+         { name: 'meta'},
         { name: 'estatus'},
     ] 
 });

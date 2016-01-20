@@ -15,7 +15,7 @@ class Actividad_model extends CI_Model{
         
 	 public function cargarPlandeAccion($usuario){
      
-            $query = $this->db->query("select actividad.id, actividad.descripcion,  avance.fechaasignacion as fecha, evento.titulo as evento
+            $query = $this->db->query("select actividad.id, actividad.descripcion,concat(actividad.meta,' ',actividad.medida) as meta, actividad.medida, avance.fechaasignacion as fecha, evento.titulo as evento
                                         from actividad 
                                         inner join avance on actividad.id=avance.actividad
                                         inner join evento on evento.id=actividad.evento

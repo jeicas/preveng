@@ -18,7 +18,8 @@ Ext.define('myapp.view.consultar.ListaAvanceFinal', {
             summaryType: 'count',
             groupHeaderTpl: '<font size=2><font size=2>{name}</font>',
             hideGroupedHeader: true,
-            enableGroupingMenu: false
+            enableGroupingMenu: false, 
+            startCollapsed : true
        }],
     store: Ext.create('myapp.store.avance.AvanceFinalStore'),
     emptyText: 'No hay Avances por Evaluar',
@@ -35,6 +36,9 @@ Ext.define('myapp.view.consultar.ListaAvanceFinal', {
     },
     buildColumns: function () {
         return [
+            {
+            xtype: 'rownumberer'
+        },
             {
                 dataIndex: 'id',
                 hidden: true,
@@ -145,6 +149,9 @@ Ext.define('myapp.view.consultar.ListaAvanceFinal', {
                 dataIndex: 'descripcion',
                 flex: 1.5,
                 text: 'Avance',
+                  renderer: function(v){ 
+                             return ('<SPAN class="ajustar-texto-grid">'+v+'</SPAN>')
+                         },
                 items: {
                     xtype: 'textfield',
                     flex: 1,
@@ -168,9 +175,9 @@ Ext.define('myapp.view.consultar.ListaAvanceFinal', {
                 }
             },
             {
-                dataIndex: 'tipo',
+                dataIndex: 'meta',
                 flex: 0.5,
-                text: 'Tipo',
+                text: 'Meta Lograda',
                 items: {
                     xtype: 'textfield',
                     flex: 1,
@@ -243,32 +250,7 @@ Ext.define('myapp.view.consultar.ListaAvanceFinal', {
                         buffer: 500
                     }
                 }
-            }, {
-                flex: 0.5,
-                dataIndex: 'apellido',
-                text: 'Apellido',
-                items: {
-                    xtype: 'textfield',
-                    flex: 1,
-                    margin: 2,
-                    enableKeyEvents: true,
-                    listeners: {
-                        keyup: function () {
-                            var store = this.up('grid').store;
-                            store.clearFilter();
-                            if (this.value) {
-                                store.filter({
-                                    property: 'apellido',
-                                    value: this.value,
-                                    anyMatch: true,
-                                    caseSensitive: false
-                                });
-                            }
-                        },
-                        buffer: 500
-                    }
-                }
-            }]
+            }, ]
     },
     buildDockedItems: function () {
         return [{

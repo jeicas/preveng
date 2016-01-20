@@ -18,7 +18,9 @@ Ext.define('myapp.view.evento.ListaReincidenciaEvento', {
         me.callParent();
     },
     buildColumns: function () {
-        return [ 
+        return [  {
+            xtype: 'rownumberer'
+        }, 
 		{
                 dataIndex: 'fecha',
                 flex: 1.5,

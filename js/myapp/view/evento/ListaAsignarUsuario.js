@@ -22,7 +22,9 @@ Ext.define('myapp.view.evento.ListaAsignarUsuario', {
         me.callParent();
     },
     buildColumns: function () {
-        return [ 
+        return [   {
+            xtype: 'rownumberer'
+        },
              {
 			text:'',
 			dataIndex:'id',

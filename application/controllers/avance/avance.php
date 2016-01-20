@@ -36,6 +36,7 @@ class Avance extends CI_Controller {
         $costo = $this->input->post('txtCosto');
         $fecharegistro = date('Y-m-d');
         $descripcion = $this->input->post('txtDescripcion');
+        $meta = $this->input->post('txtmetalograda');
         $estatusEv=2;
         //busca los datos de la actividad.
         $resultadoAct = $this->actividad_model->buscarUnPlandeAccion($usuario, $actividad);
@@ -52,6 +53,7 @@ class Avance extends CI_Controller {
                             'fechaasignacion' => $row["fechaasignacion"],
                             'tipo' => $tipo,
                             'costo' => $costo,
+                            'meta' => $meta,
                             'estatus' => $estatus,
                         );
                           $result = $this->avance_model->actualizarAvance($dataAvance);
@@ -66,6 +68,7 @@ class Avance extends CI_Controller {
                             'fecharegistro' => $fecharegistro,
                             'tipo' => $tipo,
                             'costo' => $costo,
+                             'meta' => $meta,
                             'estatus' => $estatus,
                         );
 
@@ -93,6 +96,7 @@ class Avance extends CI_Controller {
                             'fechaasignacion' => $row["fechaasignacion"],
                             'tipo' => $tipo,
                             'costo' => $costo,
+                             'meta' => $meta,
                             'estatus' => $estatus,
                         );
 
@@ -113,6 +117,7 @@ class Avance extends CI_Controller {
                             'fecharegistro' => $fecharegistro,
                             'tipo' => $tipo,
                             'costo' => $costo,
+                             'meta' => $meta,
                             'estatus' => $estatus,
                         );
 
@@ -281,16 +286,15 @@ class Avance extends CI_Controller {
         if ($avances->num_rows() > 0) {
 
             foreach ($avances->result_array() as $row) {
-
                 
-                switch ($row['extension']) {
+                 switch ($row['extension']) {
                     case 'html': {
                             $direccion = $row['anexo'];
-                            $imagen = "../../imagen/btn/web-icono.jpg";
+                            $imagen = "../../imagen/btn/red.png";
                         }
                         break;
                     case 'jpg': {
-                            $imagen = "../../imagen/btn/imagen-icono.jpg";
+                            $imagen = "../../imagen/btn/imagen.png";
                             $direccion = "../../anexosAvance/" . $row['anexo'] . ".jpeg";
                         }
                         break;
@@ -300,37 +304,42 @@ class Avance extends CI_Controller {
                         }
                         break;
                     case 'png': {
-                            $imagen = "../../imagen/btn/imagen-icono.jpg";
+                            $imagen = "../../imagen/btn/imagen.png";
                             $direccion = "../../anexosAvance/" . $row['anexo'] . "." . $row['extension'];
                         }
                         break;
                     case 'gif': {
-                            $imagen = "../../imagen/btn/imagen-icono.jpg";
+                            $imagen = "../../imagen/btn/imagen.png";
                             $direccion = "../../anexosAvance/" . $row['anexo'] . "." . $row['extension'];
                         }
                         break;
                     case 'mp3': {
-                            $imagen = "../../imagen/btn/audio-icono.jpg";
+                            $imagen = "../../imagen/btn/sonido.png";
                             $direccion = "../../anexosAvance/" . $row['anexo'] . "." . $row['extension'];
                         }
                         break;
                   
                     
                     case 'pdf': {
-                            $imagen = "../../imagen/btn/documento-icono.png";
+                            $imagen = "../../imagen/btn/pdf-icono.png";
                             $direccion = "../../anexosAvance/" . $row['anexo'] . "." . $row['extension'];
                         }
                         break;
                     case 'doc': {
-                            $imagen = "../../imagen/btn/documento-icono.png";
+                            $imagen = "../../imagen/btn/documento.png";
                             $direccion = "../../anexosAvance/" . $row['anexo'] . "." . $row['extension'];
                         }
                         break;
                     default: {
-                            $imagen = "../../imagen/btn/icono-x.png";
-                            $direccion = "";
+                            $imagen = "../../imagen/btn/delete.png";
+                            $direccion = "";    
                         }
                 }
+
+                
+                
+                
+   
                 
 
                 
@@ -366,7 +375,15 @@ class Avance extends CI_Controller {
                 }
                 
                
-                $eventAct = "<H3><font color=#3F77E6>  Actividad: " . $row['actividad']. "</font></H3> <br> Evento: " . $row['evento']."<br>" ;
+               $metaAvances = $this->avance_model->sumTotalMetaAvance($row['idActividad']); 
+               foreach($metaAvances->result_array() as $rowMeta) {
+                    $metaAv= $rowMeta['totalmeta'];
+                    $metaAc= $rowMeta['metaact'];
+                    $unAc= $rowMeta['medida'];
+                }
+                
+                
+                $eventAct = "<H3><font color=#3F77E6>  Actividad: " . $row['actividad']. "</font></H3> <br> Evento: " . $row['evento']."<br> Meta Lograda: ". $metaAv. " de ". $metaAc. " ".$unAc."</br>" ;
 
                 $data[] = array(
                     'idAct' => $row['idActividad'],
@@ -376,12 +393,12 @@ class Avance extends CI_Controller {
                     'descripcion' => $row['descripcion'],
                     'tipo' => $tipo,
                     'fecha' => $row['fecha'],
+                    'meta' => $row['meta'],
                     'idUs' => $row['idUs'],
                     'evento' =>  $row['evento'],
                     'fechaAsignacion' => $row['fechaAsig'],
                     'costo' => $row['costo'],
-                    'nombre' => $row['nombre'],
-                    'apellido' => $row['apellido'],
+                    'nombre' => $row['nombre']." ".  $row['apellido'],
                     'observacion' => $observacion,
                     'anexo' => $imagen,
                     'direccion' => $direccion,
@@ -419,13 +436,14 @@ class Avance extends CI_Controller {
                 $data[] = array(
                     'id' => $row['id'],
                     'idAv' => $row['idAv'],
+                     'meta' => $row['meta'],
                     'evento' => $event,
                     'actividad' => $row['actividad'],
                     'descripcion' => $row['descripcion'],
                     'tipo' => $tipo,
                     'fecha' => $row['fecha'],
-                    'nombre' => $row['nombre'],
-                    'apellido' => $row['apellido'],
+                    'nombre' =>  $row['nombre']." ".  $row['apellido'],
+                    
                 );
             }
             $output = array(

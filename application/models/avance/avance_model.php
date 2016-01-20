@@ -15,7 +15,6 @@ class Avance_model extends CI_Model {
         $this->db->insert('avance', $dataAvance);
         return $this->db->insert_id();
     }
-   
 
     public function actualizarAvance($dataAvance) {
 
@@ -53,6 +52,7 @@ class Avance_model extends CI_Model {
                      evento.titulo AS evento, 
                      actividad.descripcion AS actividad,
                      av.id AS idAvance, 
+                     av.meta AS meta,
                      av.actividad AS idActividad, 
                      av.tipo AS tipo,
                      av.fecharegistro AS fecha, 
@@ -83,6 +83,20 @@ class Avance_model extends CI_Model {
         return $query;
     }
 
+    public function sumTotalMetaAvance($idactividad) {
+
+        $sql = "SELECT SUM( av.meta ) AS totalmeta, a.meta AS metaact, a.medida AS medida
+                FROM prevengo.avance AS av
+                INNER JOIN actividad a ON a.id = av.actividad
+                AND av.actividad =$idactividad
+                ";
+
+
+        $query = $this->db->query($sql);
+
+        return $query;
+    }
+
     public function consultarListaAvanceFinal() {
 
         $sql = "SELECT actividad.id AS id,
@@ -91,6 +105,7 @@ class Avance_model extends CI_Model {
                      av.descripcion AS descripcion, 
                      actividad.descripcion AS actividad, 
                      av.tipo AS tipo, 
+                     av.meta as meta,
                      av.fecharegistro AS fecha, 
                      bdgenerica.persona.nombre AS nombre, 
                      bdgenerica.persona.apellido AS apellido 
@@ -131,11 +146,11 @@ class Avance_model extends CI_Model {
 
         return $query;
     }
-    
-  public function cargarUsuarios() {
 
-    
-          $sql = "SELECT bdgenerica.usuario.id,
+    public function cargarUsuarios() {
+
+
+        $sql = "SELECT bdgenerica.usuario.id,
 	                    bdgenerica.usuario.nacionalidad,
                         bdgenerica.usuario.cedula,
                         bdgenerica.empleado.id as empl,
@@ -158,26 +173,27 @@ class Avance_model extends CI_Model {
                        ON bdgenerica.empleado.division= bdgenerica.division.id
                      INNER JOIN  bdgenerica.tipousuario
                        ON bdgenerica.usuario.tipousuario= bdgenerica.tipousuario.id";
-         $query = $this->db->query($sql);
-         
+        $query = $this->db->query($sql);
+
         return $query;
-  }//fin de la funcion
-    
-  
-     public function  buscarEjecutorDeActividad($id){         
-            $query = $this->db->query("select count(*) as cuantos
+    }
+
+//fin de la funcion
+
+    public function buscarEjecutorDeActividad($id) {
+        $query = $this->db->query("select count(*) as cuantos
 
                                     from prevengo.avance 
                                     
                                     where  prevengo.avance.actividad=$id 					 												   
                                           
                                  ");
-       
-            return $query; 
+
+        return $query;
     }
-    
-       public function  buscarAvance($id){         
-            $query = $this->db->query("select count(*) as cuantos
+
+    public function buscarAvance($id) {
+        $query = $this->db->query("select count(*) as cuantos
                                         from actividad 
                                         inner join avance on actividad.id=avance.actividad
                                         inner join evento on evento.id=actividad.evento
@@ -185,9 +201,12 @@ class Avance_model extends CI_Model {
                                         order by actividad.estatus, actividad.id					 												   
                                           
                                  ");
-       
-            return $query; 
+
+        return $query;
     }
-}//fin de la clase
+
+}
+
+//fin de la clase
 
 

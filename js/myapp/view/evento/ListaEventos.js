@@ -53,7 +53,9 @@ Ext.define('myapp.view.evento.ListaEventos', {
         me.callParent();
     },
     buildColumns: function () {
-        return [
+        return [  {
+            xtype: 'rownumberer'
+        },
             {
                 dataIndex: 'fechaEvento',
                 flex: 0.4,

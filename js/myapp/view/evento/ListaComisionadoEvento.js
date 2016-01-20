@@ -18,7 +18,9 @@ Ext.define('myapp.view.evento.ListaComisionadoEvento', {
         me.callParent();
     },
     buildColumns: function () {
-        return [ {
+        return [  {
+            xtype: 'rownumberer'
+        }, {
 			text:'Foto',
 			dataIndex:'foto',
 			flex: 0.3,

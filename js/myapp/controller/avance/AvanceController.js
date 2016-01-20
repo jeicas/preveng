@@ -235,6 +235,8 @@ Ext.define('myapp.controller.avance.AvanceController', {
             if (storeAct.data.items[i].data['id'] == valor) {
                 formulario.down("label[name=lblFechaAsignacion]").setText(storeAct.data.items[i].data['fecha']);
                 formulario.down("label[name=lblNombreEvento]").setText(storeAct.data.items[i].data['evento']);
+                formulario.down("label[name=lblMeta]").setText(storeAct.data.items[i].data['meta']);
+                 formulario.down("label[name=lblUnidad]").setText(storeAct.data.items[i].data['medida']);
                 i = length + 1;
             }
 

@@ -79,6 +79,8 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
             editWindow.down('textfield[name=dtfFechaT]').setValue(record[0].get('fecha'));
             editWindow.down('textfield[name=dtfFechaPA]').setValue(record[0].get('fechaPA'));
             editWindow.down('combobox[name=cmbActividadDepende]').setValue(record[0].get('depende'));
+            editWindow.down('numberfield[name=meta]').setValue(record[0].get('meta'));
+            editWindow.down('textfield[name=medida]').setValue(record[0].get('medida'));
             editWindow.show();
             if (record[0].get('depende')!='null'){
                 tieneDepende=record[0].get('iddepende');
@@ -216,8 +218,7 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
                     }else 
                     {
                          ActividadDependiente=win.down("combobox[name=cmbActividadDepende]").getValue();
-                    }
-                    
+                    } 
                 }
                 else {
                     

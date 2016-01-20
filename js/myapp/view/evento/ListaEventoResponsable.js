@@ -47,7 +47,9 @@ Ext.define('myapp.view.evento.ListaEventoResponsable', {
         me.callParent();
     },
     buildColumns: function () {
-        return [
+        return [  {
+            xtype: 'rownumberer'
+        },
             {
                 dataIndex: 'idEv',
                 flex: 1.5,

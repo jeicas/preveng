@@ -17,7 +17,8 @@ Ext.define('myapp.view.avance.GridListaAvance', {
             summaryType: 'count',
             groupHeaderTpl: '<font size=2><font size=2>{name}</font>',
             hideGroupedHeader: true,
-            enableGroupingMenu: false
+            enableGroupingMenu: false, 
+            startCollapsed : true
        }],
     store: Ext.create('myapp.store.avance.AvanceStore'),
         viewConfig: {
@@ -52,7 +53,9 @@ Ext.define('myapp.view.avance.GridListaAvance', {
         me.callParent();
     },
     buildColumns: function () {
-        return [
+        return [  {
+            xtype: 'rownumberer'
+        },
             {
                 dataIndex: 'actividad',
                 flex: 1.5,
@@ -83,6 +86,9 @@ Ext.define('myapp.view.avance.GridListaAvance', {
                 dataIndex: 'descripcion',
                 flex: 1.5,
                 text: 'Descripcion',
+                  renderer: function(v){ 
+                             return ('<SPAN class="ajustar-texto-grid">'+v+'</SPAN>')
+                         },
                 items: {
                     xtype: 'textfield',
                     flex: 1,
@@ -181,54 +187,28 @@ Ext.define('myapp.view.avance.GridListaAvance', {
                         buffer: 500
                     }
                 }
-            }, {
-                flex: 0.5,
-                dataIndex: 'apellido',
-                text: 'Apellido',
-                items: {
-                    xtype: 'textfield',
-                    flex: 1,
-                    margin: 2,
-                    enableKeyEvents: true,
-                    listeners: {
-                        keyup: function () {
-                            var store = this.up('grid').store;
-                            store.clearFilter();
-                            if (this.value) {
-                                store.filter({
-                                    property: 'apellido',
-                                    value: this.value,
-                                    anyMatch: true,
-                                    caseSensitive: false
-                                });
-                            }
-                        },
-                        buffer: 500
-                    }
-                }
+            }, 
+              {
+                dataIndex: 'meta',
+                flex: 0.3,
+                text: 'Meta',
             },{
                 dataIndex: 'anexo',
                 flex: 0.5,
                 text: 'Anexo',
                 renderer: function(value, metadata, record){
-				return '<img width="50" height="50" src="'+ value +'">';
-			}
+                    
+                     if (record.data.direccion==''){
+                         return '<img width="50" height="50" src="'+ value +'">';
+                     }else {
+                         return '<a target="_blank" href="'+record.data.direccion+'"><img width="50" height="50" src="'+ value +'"></a>';
+                     }
+			
+                        }
+			
               
             }, 
-            {
-                dataIndex: 'direccion',
-                flex: 0.5,
-                text: 'Direccion',
-               renderer  : function(myValue, metadata,record) {
-                   if (myValue==''){
-                        return '';
-                   }else{
-                       return '<a target="_blank" href="'+myValue+'">'+'<img width="80" height="50" src="../../imagen/btn/icono-ver.png"></a>';
-                   }
-                            
-                        }
-              
-            },
+          
             {
                 flex: 0.5,
                 dataIndex: 'estatus',

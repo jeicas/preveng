@@ -18,7 +18,9 @@ Ext.define('myapp.view.actividad.ListaEmpleadoPlan', {
         me.callParent();
     },
     buildColumns: function () {
-        return [ 
+        return [   {
+            xtype: 'rownumberer'
+        },
              {
 			flex: 0.5,
 			dataIndex: 'fecha',

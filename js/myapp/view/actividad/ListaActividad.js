@@ -48,7 +48,11 @@ Ext.define('myapp.view.actividad.ListaActividad', {
         me.callParent();
     },
     buildColumns: function () {
-        return [ {
+        return [
+              {
+            xtype: 'rownumberer'
+        },
+            {
                 dataIndex: 'id',
                 hidden: true,
                 flex: 0.2,
