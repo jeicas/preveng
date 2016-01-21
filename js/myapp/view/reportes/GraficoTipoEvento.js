@@ -12,7 +12,7 @@ Ext.define('myapp.view.reportes.GraficoTipoEvento', {
     axes: [{
             type: 'Numeric',
             position: 'left',
-            fields: ['Completado', 'Pendiente', 'En Ejecucion'],
+            fields: ['Completado', 'En Ejecucion','Pendiente'],
             title: 'Nº de Eventos por Tipo',
             grid: true,
             label: {
@@ -31,7 +31,7 @@ Ext.define('myapp.view.reportes.GraficoTipoEvento', {
             highlight: true,
             column: true,
             xField: 'cantidad',
-            yField: ['Completado', 'Pendiente', 'En Ejecucion'],
+            yField: ['Completado', 'En Ejecucion', 'Pendiente'],
             stacked: true,
             tips: {
                 trackMouse: true,

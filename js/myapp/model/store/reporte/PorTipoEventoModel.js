@@ -7,6 +7,7 @@ Ext.define('myapp.model.store.reporte.PorTipoEventoModel', {
        {name: 'Completado',     type: 'int'},
        {name: 'Pendiente',     type: 'int'},
        {name: 'En Ejecucion',     type: 'int'},
+       {name: 'otro',     type: 'int'},
        {name: 'avance',     type: 'string'},
        {name: 'estatus',     type: 'string'},
         

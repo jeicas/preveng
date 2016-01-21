@@ -39,25 +39,18 @@ Ext.define('myapp.view.evento.ListaReincidenciaEvento', {
                 dataIndex: 'anexo',
                 flex: 0.3,
                 text: 'Anexo',
-                renderer: function(value, metadata, record){
-				return '<img width="30" height="30" src="'+ value +'">';
-			}
+                  renderer: function (value, metadata, record) {
+
+                    if (record.data.direccion == '') {
+                        return '<img  src="' + value + '">';
+                    } else {
+                        return '<a target="_blank" href="' + record.data.direccion + '"><img  src="' + value + '"></a>';
+                    }
+
+                }
               
             }, 
-            {
-                dataIndex: 'direccion',
-                flex: 0.3,
-                text: 'Direccion',
-               renderer  : function(myValue, metadata,record) {
-                   if (myValue==''){
-                        return '';
-                   }else{
-                       return '<a target="_blank" href="'+myValue+'">'+'VER</a>';
-                   }
-                            
-                        }
-              
-            }
+         
              
             ]
     },

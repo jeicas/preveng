@@ -24,7 +24,7 @@ Ext.define('myapp.view.evento.Evento', {
                         y: 20,
                         width: 300,
                         fieldLabel: 'Nombre del Evento:',
-                         name:'txtTitulo'
+                        name:'txtTitulo'
                     },
                     {
                         xtype: 'textareafield',

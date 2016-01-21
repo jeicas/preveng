@@ -289,7 +289,10 @@
 
 
 .icon-eventoR{
-  background-image:url('../imagen/btn/event.png') !important;
+  background-image:url('../imagen/btn/barra.png') !important;
+}
+.icon-eventoL{
+  background-image:url('../imagen/btn/emplea2.png') !important;
 }
 .price{
    background-image: url('../imagen/logo/bannerprevengo.png') !important;

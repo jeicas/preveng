@@ -78,6 +78,11 @@ Ext.define('myapp.view.reportes.ReporteGraficoTipoEvento', {
                                 text: 'En Ejecución',  
                                 flex: 0.6
                             }, 
+                             {
+                                dataIndex: 'otro',
+                                text: 'Cancelado/Expirado',  
+                                flex: 0.6
+                            }, 
                             {
                                 dataIndex: 'cantidad',
                                 text: 'Total',  

@@ -189,8 +189,9 @@ class Evento_model extends CI_Model {
         $query = $this->db->query("SELECT (e.tipoevento) as tipo,
                                      If(e.estatus='1' || e.estatus='4',count(e.estatus),0) as pendiente,
                                      If(e.estatus='2',count(e.estatus),0) as ejecucion,
-                                     If(e.estatus='0',count(e.estatus),0) as completado 
-                                     FROM  evento as e where e.tipoevento=$tipo and e.estatus in (0,1,2,4)
+                                     If(e.estatus='0',count(e.estatus),0) as completado,
+                                     If(e.estatus='5' || e.estatus='3',count(e.estatus),0) as ce 
+                                     FROM  evento as e where e.tipoevento=$tipo
                                         group by e.estatus");
         
         return $query;

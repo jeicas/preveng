@@ -67,7 +67,7 @@ class Reincidencia extends CI_Controller {
                         }
                         break;
                     default: {
-                            $imagen = "../../imagen/btn/userdelete.png";
+                            $imagen = "../../imagen/btn/delete.png";
                             $direccion = "";
                         }
                 }

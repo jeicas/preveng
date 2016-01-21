@@ -231,6 +231,12 @@ Ext.define('myapp.view.Viewport', {
                                                 text: 'Reincidencias',
                                             },
                                             {
+                                                xtype: 'textfield',
+                                                fieldLabel: 'Evento:',
+                                                name: 'idEvento', 
+                                                hidden:true
+                                            },
+                                            {
                                                 xtype: 'tbfill'
                                             },
                                             {

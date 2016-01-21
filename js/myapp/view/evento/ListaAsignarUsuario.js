@@ -181,14 +181,18 @@ Ext.define('myapp.view.evento.ListaAsignarUsuario', {
                 store: this.store,
                 displayInfo: true,
                   items:[
-                      
                        {
                         xtype: 'button',
                         name: 'btnGuardar',
                         text: 'Guardar',
                         iconCls: 'save'
-                    }  
-                             
+                    }, 
+                    
+                        {
+                        xtype: 'textfield',
+                        name: 'txtEvento',
+                       
+                    }      
                     
                 ]
             },

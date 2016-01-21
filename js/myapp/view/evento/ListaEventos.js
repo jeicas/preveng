@@ -291,7 +291,18 @@ Ext.define('myapp.view.evento.ListaEventos', {
                     }
                 }
             },
-            
+             {
+                xtype: 'actioncolumn',
+                flex: 0.1,
+                name: 'ver',
+                sortable: false,
+                menuDisabled: true,
+                items: [{
+                        iconCls: 'icon-eventoL',
+                        tooltip: 'Lineamientos/Comisionados/Reincidencias del Evento',
+                        scope: this,
+                    }]
+            },
             {
                 xtype: 'actioncolumn',
                 flex: 0.1,

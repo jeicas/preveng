@@ -137,7 +137,7 @@ Ext.define('myapp.controller.evento.EventoReincidenciaListaController', {
     }, // fin de la function
     // ====================funciones de la ventana listaComisionadoEvento================
     onClickNuevoReincidencia: function (button, e, options) {
-        /*var grid = this.getListaEventos();
+        var grid = this.getListaEventos();
         record = grid.getSelectionModel().getSelection();
 
         win = Ext.create('myapp.view.evento.WinReincidencia');
@@ -145,7 +145,7 @@ Ext.define('myapp.controller.evento.EventoReincidenciaListaController', {
         win.down('textfield[name=txtIdEvento]').setValue(record[0].get('idEv'));
         win.down('button[name=btnGuardar]').setVisible(false);
          win.down('fieldset[name=formAnexo]').setVisible(false);
-        win.show();*/
+        win.show();
     },
     onClickEliminarReincidencia: function (button, e, options) {
         var grid = this.getListaReincidenciaEvento();
