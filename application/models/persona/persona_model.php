@@ -24,4 +24,21 @@ class Persona_model extends CI_Model{
     public function getPersona($cedula,$nacionalidad){
         return $this->db->get_where('persona',array('cedula' => $cedula,'nacionalidad' => $nacionalidad));
     }
+    
+     public function getPersonaE($cedula){
+        return $this->db->get_where('persona',array('cedula' => $cedula));
+    }
+    public function getDatosEmpleado($idEmpleado) {
+        
+        $query = $this->db->query("SELECT bdgenerica.p.* 
+                                        FROM bdgenerica.persona p
+                                        INNER JOIN bdgenerica.empleado e ON p.cedula = e.cedula
+                                        AND e.id =$idEmpleado
+                                        LEFT JOIN bdgenerica.usuario u ON e.cedula = u.cedula");
+        
+       
+         return $query;
+    
+        }       
+
 }

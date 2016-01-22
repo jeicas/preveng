@@ -15,6 +15,7 @@ class Actividad extends CI_Controller {
         $this->load->model('actividad/actividad_model');
         $this->load->model('evento/evento_model');
         $this->load->model('avance/avance_model');
+        $this->load->library('../controllers/scriptcorreoprevengo');
     }
 
 //fin del constructor
@@ -473,7 +474,9 @@ class Actividad extends CI_Controller {
         $evento = $this->input->post('event');
         $usuario = $this->input->post('user');
         $estatus = 1;
-
+        $eventN = $this->input->post('evento');
+        $correo = $this->input->post('correo');
+        $nombre = $this->input->post('nombre');
 
         $datactividad = array(
             'usuario' => $usuario,
@@ -485,6 +488,10 @@ class Actividad extends CI_Controller {
         $result = $this->actividad_model->guardarActividad($datactividad);
 
         if ($result) {
+            
+             $this->scriptcorreoprevengo->emailNuevoResponsable($correo,$nombre,$eventN);
+            
+            
             echo json_encode(array(
                 "success" => true,
                 "msg" => "Se Guardo con Éxito." //modificado en la base de datos
@@ -504,7 +511,9 @@ class Actividad extends CI_Controller {
 
         $evento = $this->input->post('event');
         $usuario = $this->input->post('user');
-
+       $eventN = $this->input->post('evento');
+        $correo = $this->input->post('correo');
+        $nombre = $this->input->post('nombre');
 
         $datactividad = array(
             'usuario' => $usuario,
@@ -515,6 +524,9 @@ class Actividad extends CI_Controller {
         $result = $this->actividad_model->actualizarActividad($datactividad);
 
         if ($result) {
+            
+             $this->scriptcorreoprevengo->emailNuevoResponsable($correo,$nombre,$eventN);
+            
             echo json_encode(array(
                 "success" => true,
                 "msg" => "Se reasignó el responsable con Éxito." //modificado en la base de datos

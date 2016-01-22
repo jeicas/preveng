@@ -10,8 +10,12 @@ class Comisionado extends CI_Controller {
         session_start();
         $this->load->helper('url');
         $this->load->database();
-        $this->load->library('session');
         $this->load->model('comisionado/comisionado_model');
+        $this->load->model('persona/persona_model');
+        $this->load->model('evento/evento_model');
+        $this->load->library('session');
+        $this->load->library('../controllers/scriptcorreoprevengo');
+      
     }
 
     public function listaComisionado() {
@@ -58,29 +62,43 @@ class Comisionado extends CI_Controller {
         $idEvento = $this->input->post('idEv');
         $idUsuario = $this->input->post('idUs');
         $estatus =1;
+            $event= $this->evento_model->getDatosEvento($idEvento);
+             if ($event->num_rows() > 0){
+                 foreach ($event->result_array() as $dat) {
+                      $evento=$dat['titulo'];   
+               }
+             }
+           
         
+        $persona= $this->persona_model->getDatosEmpleado($idUsuario);
+        if ($persona->num_rows() > 0){
+            foreach ($persona->result_array() as $datos) {
+            $nombre=$datos['nombre']." ".$datos['apellido']; 
+            $correo=$datos['correo'];  
+          }
+        }
+
         $data = array(
             'evento' => $idEvento,
             'empleado' => $idUsuario,
             'estatus' => $estatus,
         );
-
-
-        $result = $this->comisionado_model->guardarComisionado($data);
-
-        if ($result) {
+        
+      $result = $this->comisionado_model->guardarComisionado($data);
+        if ($result) {    
+            $this->scriptcorreoprevengo->emailNuevoComisionado($correo, $nombre,$evento);
             echo json_encode(array(
                 "success" => true,
-                "msg" => "Se Guardo con Éxito." //modificado en la base de datos
+                "msg" => 'Comisionado asignado exitosamente'
             ));
         } else {
-
             echo json_encode(array(
                 "success" => false,
                 "msg" => "No se pudo Guardar, por favor verifique los datos suministrados" //no se modifico en la base de datos
             ));
         }
     }//fin registrar
+  
 
    public function buscarComisionado() {
         $id = $this->input->post('id');

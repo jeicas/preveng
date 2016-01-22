@@ -95,7 +95,7 @@ Ext.define('myapp.controller.registrar.UsuarioController', {
         if (e.getKey() == e.ENTER || e.getKey() == e.TAB){
             var win = field.up('window'),
             formPanel = win.down('form'),
-            nac = formPanel.down('textfield[name=nacionalidad]').getValue(),  
+            nac = formPanel.down('combobox[name=nacionalidad]').getValue(),  
             ced = formPanel.down('textfield[name=cedula]').getValue();
             foto=formPanel.down('textfield[name=foto]').getValue();
             Ext.Ajax.request({
@@ -128,7 +128,7 @@ Ext.define('myapp.controller.registrar.UsuarioController', {
             editWindow.down('form').getForm().reset();
             editWindow.down('form').loadRecord(record[0]);
             editWindow.down('textfield[name=cedula]').setReadOnly(true);
-            editWindow.down('textfield[name=nacionalidad]').setReadOnly(true);
+            editWindow.down('combobox[name=nacionalidad]').setReadOnly(true);
             editWindow.down('textfield[name=nombre]').setReadOnly(true);
             editWindow.down('textfield[name=apellido]').setReadOnly(true);
             grid.close();
@@ -152,7 +152,7 @@ Ext.define('myapp.controller.registrar.UsuarioController', {
             editWindow.down('form').getForm().reset();
             editWindow.down('form').loadRecord(record[0]);
             editWindow.down('textfield[name=cedula]').setReadOnly(true);
-            editWindow.down('textfield[name=nacionalidad]').setReadOnly(true);
+            editWindow.down('combobox[name=nacionalidad]').setReadOnly(true);
             editWindow.down('textfield[name=nombre]').setReadOnly(true);
             editWindow.down('textfield[name=apellido]').setReadOnly(true);
             if (record[0].get('foto')){
@@ -185,7 +185,7 @@ Ext.define('myapp.controller.registrar.UsuarioController', {
         var tipousuario=form.down("combobox[name=tipousuario]").getValue();
         var usuario=form.down("textfield[name=usuario]").getValue();
         var status=form.down("combobox[name=status]").getValue();
-        console.log(tipousuario);
+      
         me=this;
         if (form.getForm().isValid()) { 
                Ext.Ajax.request({ 
@@ -197,13 +197,16 @@ Ext.define('myapp.controller.registrar.UsuarioController', {
                         nacionalidad:nacionalidad,
                         tipousuario:tipousuario,
                         usuario:usuario,
-                        status:status
+                        status:status, 
+                        correo:form.down("textfield[name=correo]").getValue(),
+                        nombre:form.down("textfield[name=nombre]").getValue()+" "+form.down("textfield[name=apellido]").getValue()
+                         
                     },
                     success : function(form,action) {
                         var result = Ext.JSON.decode(form.responseText);;
                        
                         if (result.success) {
-                            Ext.Msg.alert('Informaci&oacute;n','Usuario guardado con Exito');
+                            Ext.Msg.alert('Informaci&oacute;n',result.msg);
                             win.close();
                             grid.getStore().load();
                             grid.getSelectionModel().clearSelections();

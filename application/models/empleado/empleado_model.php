@@ -286,6 +286,7 @@
             return false;
         }
     }
+    
   function insertEmpleado($dataempleado){
          $db_generica = $this->load->database('bdgenerica', TRUE);//Inicia la BD generica
         return $db_generica->insert('empleado', $dataempleado);

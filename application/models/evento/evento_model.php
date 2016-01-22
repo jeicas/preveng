@@ -7,6 +7,7 @@ class Evento_model extends CI_Model {
 
     public function __construct() {
         parent::__construct();
+        $this->load->database();
     }
 
     public function cargarListaEvento() {
@@ -45,6 +46,16 @@ class Evento_model extends CI_Model {
         return $query;
     }
 
+     public function getDatosEvento($id) {
+        $query = $this->db->query("SELECT *
+                             from evento 
+                             where id=$id");
+       
+        return $query;
+    }
+    
+    
+    
     public function cargarListaEventoTodo() {
 
         $query = $this->db->query("Select evento.id as idEv, 

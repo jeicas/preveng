@@ -60,7 +60,21 @@ Ext.define('myapp.view.actividad.ListaEmpleadoPlan', {
                         xtype: 'label',
                         name: 'lblIdActividad',
                         text: '',
-                        hidden:true
+                        hidden:false
+     
+                    }, 
+                      {
+                        xtype: 'label',
+                        name: 'lblActividad',
+                        text: '',
+                        hidden:false
+     
+                    }, 
+                    {
+                        xtype: 'label',
+                        name: 'lblEvento',
+                        text: '',
+                        hidden:false
      
                     }
                 ]

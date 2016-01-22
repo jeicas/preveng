@@ -102,9 +102,7 @@ Ext.define('myapp.controller.evento.EventoResponsableListaController', {
          var win = this.getWinAsignarUsuario();
          record1 = gridUsu.getSelectionModel().getSelection();
          record2 = grid.getSelectionModel().getSelection();
-        
-       
-        
+          
         if(record1[0]){
                     
                 Ext.Ajax.request({
@@ -113,6 +111,9 @@ Ext.define('myapp.controller.evento.EventoResponsableListaController', {
                     params: {
                         user:record1[0].get('id'),
                         event:record2[0].get('idEv'),
+                        evento:record2[0].get('titulo'), 
+                        nombre:record1[0].get('nombrecompleto'),
+                        correo:record1[0].get('correo'),
                     },
                     
                      success: function(result, request){
@@ -148,6 +149,7 @@ Ext.define('myapp.controller.evento.EventoResponsableListaController', {
          record1 = gridUsu.getSelectionModel().getSelection();
          record2 = grid.getSelectionModel().getSelection();
         
+             console.log(record2);
      
         if(record1[0]){
                     
@@ -157,6 +159,9 @@ Ext.define('myapp.controller.evento.EventoResponsableListaController', {
                     params: {
                         user:record1[0].get('id'),
                         event:record2[0].get('idEv'),
+                        evento:record2[0].get('titulo'), 
+                        nombre:record1[0].get('nombrecompleto'),
+                        correo:record1[0].get('correo'),
                     },
                     
                      success: function(result, request){

@@ -456,6 +456,10 @@ Ext.define('myapp.controller.evento.EventoListaController', {
         record1 = grid2.getSelectionModel().getSelection();
         if (record1 != '') {
             store = grid3.getStore();
+            
+            if (store.data.items.length==0){
+                encontrado = false;
+            }
             for (i = 0; i < store.data.items.length; i++) {
                 if (record1[0].get('idEmpl') == store.data.items[i].data['idUs'])
                 {

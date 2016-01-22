@@ -15,7 +15,9 @@ class Avance extends CI_Controller {
         $this->load->model('avance/avance_model');
         $this->load->model('actividad/actividad_model');
         $this->load->model('evento/evento_model');
-         $this->load->model('anexo/anexo_model');
+        $this->load->model('anexo/anexo_model');
+        $this->load->model('persona/persona_model');
+        $this->load->library('../controllers/scriptcorreoprevengo');
     }
   public function guardar_Imagen_Anexo($nombrefoto, $fotoType, $fotoTmp_name) {
         if ($fotoTmp_name == '') {
@@ -195,10 +197,16 @@ class Avance extends CI_Controller {
     
     
      public function asignarEmpleado() {
+         $user=$this->session->userdata('datasession');
         $actividad = $this->input->post('activ');
         $usuario = $this->input->post('user');
         $fecha= date('Y-m-d');
         $estatus = 1;
+        $correo=$this->input->post('correo');
+        $nombre=$this->input->post('nombre');
+        $evento=$this->input->post('evento');
+        $titleactividad=$this->input->post('tactiv');
+        $responsable=$user['nombre'];
       
          $dataAvance = array('actividad' => $actividad,
                             'usuario' => $usuario,
@@ -208,9 +216,9 @@ class Avance extends CI_Controller {
             
          $result = $this->avance_model->guardarAvance($dataAvance);
 
-
-
         if ($result) {
+             $this->scriptcorreoprevengo->emailNuevoEjecutor($correo,$nombre,$responsable, $evento, $titleactividad);
+            
             echo json_encode(array(
                 "success" => true,
                 "msg" => "Se Guardo con Éxito." 
@@ -625,6 +633,7 @@ class Avance extends CI_Controller {
                     'foto' => $row['foto'],
                     'nombrecompleto' => $row['nombre'] . " " . $row['apellido'],
                     'ente' => $row['ente'],
+                      'correo' => $row['correo'],
                     'division' => $row['division'],
                     'tipousuario' => $row['tipousuario'],
                 );

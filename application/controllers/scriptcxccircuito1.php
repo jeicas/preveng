@@ -135,12 +135,11 @@ class Scriptcxccircuito extends CI_Controller {
     }
 
     public function emailResumencircuito($idcircuito, $nombrecircuito, $correocordinador, $nombrecordinador) {
-        print_r($nombrecircuito);
         $totalxcircuito = $this->circuito_model->verificartotalcircuito($idcircuito);
         if ($totalxcircuito->num_rows() > 0) {
             $row1 = $totalxcircuito->row_array();
             $cantidad = $row1['cantidad'];
-            $user = 'tecnologiaprogresista.lara@gmail.com';
+            $user = 'sistemaelectoralavanzadalara@gmail.com';
             $pass = 'avanzadalara';
             $from = 'Sistema Casa x Casa';
             ;
@@ -325,7 +324,7 @@ class Scriptcxccircuito extends CI_Controller {
             $row2 = $totalxcircuitomunicipio->row_array();
             $cantidad = $row2['cantidadmuni'];
             $nombremunicipio = substr($row2['municipio'], 4);
-            $user = 'tecnologiaprogresista.lara@gmail.com';
+            $user = 'sistemaelectoralavanzadalara@gmail.com';
             $pass = 'avanzadalara';
             $from = 'Sistema Casa x Casa';
             ;
@@ -510,7 +509,7 @@ class Scriptcxccircuito extends CI_Controller {
         if ($totalxcircuitoparroquia->num_rows() > 0) {
             $row2 = $totalxcircuitoparroquia->row_array();
             $nombreparroquia = substr($row2['parroquia'], 4);
-            $user = 'tecnologiaprogresista.lara@gmail.com';
+            $user = 'sistemaelectoralavanzadalara@gmail.com';
             $pass = 'avanzadalara';
             $from = 'Sistema Casa x Casa';
             ;
@@ -690,7 +689,7 @@ class Scriptcxccircuito extends CI_Controller {
 
         print_r($nombrecordinador);
 
-        $user = 'tecnologiaprogresista.lara@gmail.com';
+        $user = 'sistemaelectoralavanzadalara@gmail.com';
         $pass = 'avanzadalara';
         $from = 'Sistema Casa x Casa';
         $this->load->library('email', '', 'correo');

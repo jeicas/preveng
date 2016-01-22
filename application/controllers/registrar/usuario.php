@@ -9,6 +9,7 @@ class Usuario extends CI_Controller
         $this->load->database();
         $this->load->library('session');
         $this->load->model('usuario/usuario_model');
+         $this->load->library('../controllers/scriptcorreoprevengo');
     }
     public function updatecontrasena(){
        $clave=$this->input->post('contrasena');        
@@ -111,6 +112,8 @@ class Usuario extends CI_Controller
                 //$result=$this->usuario_model->insertPersona($datapersona);
                 $result2=$this->usuario_model->insertusuario($datausuario);
                 if($result2){
+                    $nombre=$this->input->post('nombre')." ".$this->input->post('apellido');
+                    $this->scriptcorreoprevengo->emailNuevoUsuario($this->input->post('correo'), $this->input->post('usuario'),$nombre);
                    echo json_encode(array(
                         "success"   => true,
                         "msg"       => "Se Guardo con Éxito." //modificado en la base de datos

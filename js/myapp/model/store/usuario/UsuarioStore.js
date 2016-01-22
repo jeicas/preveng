@@ -10,6 +10,7 @@ Ext.define('myapp.model.store.usuario.UsuarioStore', {
         { name: 'apellido' },
         { name: 'ente' },
         { name: 'division' },
+        { name: 'correo' },
         { name: 'tipousuario' },
  
     ] 

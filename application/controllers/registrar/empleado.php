@@ -98,6 +98,9 @@ class Empleado extends CI_Controller
            echo json_encode($output);
         }
     }
+    
+   
+    
     public function obtenerEmpleadosProcesados(){
     $resultdbd=array();
         if ($resultdbd=$this->empleado_model->cargarProcesados()){

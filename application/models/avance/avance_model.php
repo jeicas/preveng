@@ -157,6 +157,7 @@ class Avance_model extends CI_Model {
                         bdgenerica.persona.foto,
                         bdgenerica.persona.nombre,
                         bdgenerica.persona.apellido,
+                        bdgenerica.persona.correo,
                         bdgenerica.ente.nombre AS ente,
                         bdgenerica.division.nombre AS division,
                         bdgenerica.tipousuario.nombre AS tipousuario

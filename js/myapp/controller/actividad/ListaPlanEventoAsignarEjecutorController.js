@@ -60,6 +60,8 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoAsignarEjecutorController'
                         store.proxy.extraParams.id = item.data.idAct;
                         store.load();
                         newGrid.down("label[name=lblIdActividad]").setText(item.data.idAct);
+                        newGrid.down("label[name=lblActividad]").setText(item.data.actividad);
+                        newGrid.down("label[name=lblEvento]").setText(item.data.evento);
                         win.setTitle("Asignar Empleados al plan de accion: " + item.data.actividad);
                         win.show();
                     } 
@@ -73,7 +75,8 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoAsignarEjecutorController'
                         store.proxy.extraParams.id = item.data.idAct;
                         store.load();
                         newGrid.down("label[name=lblIdActividad]").setText(item.data.idAct);
-                       
+                         newGrid.down("label[name=lblActividad]").setText(item.data.actividad);
+                        newGrid.down("label[name=lblEvento]").setText(item.data.evento);
                         win.setTitle("Asignar Empleados al plan de accion: " + item.data.actividad);
                         win.show();
                     } else {
@@ -83,6 +86,8 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoAsignarEjecutorController'
                         store.load();
                         newGrid.down("button[name=btnAsignarEmpleado]").setVisible(false);
                         newGrid.down("label[name=lblIdActividad]").setText(item.data.idAct);
+                        newGrid.down("label[name=lblActividad]").setText(item.data.actividad);
+                        newGrid.down("label[name=lblEvento]").setText(item.data.evento);
                         win.setTitle("Asignar Empleados al plan de accion: " + item.data.actividad);
                         win.show();
                     }
@@ -112,16 +117,18 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoAsignarEjecutorController'
         var gridUsu = this.getListaAsignarUsuario();
         var win = this.getWinAsignarUsuario();
         record = gridUsu.getSelectionModel().getSelection();
- 
+  
         if (record[0]) {
-         console.log(grid1);
-
             Ext.Ajax.request({
                 url: BASE_URL + 'avance/avance/asignarEmpleado',
                 method: 'POST',
                 params: {
                     user: record[0].get('id'),
                     activ: grid1.down("label[name=lblIdActividad]").getEl().dom.textContent,
+                    tactiv: grid1.down("label[name=lblActividad]").getEl().dom.textContent,
+                    nombre: record[0].get('nombrecompleto'),
+                    correo: record[0].get('correo'),
+                    evento: grid1.down("label[name=lblEvento]").getEl().dom.textContent,
                 },
                 success: function (result, request) {
                     data = Ext.JSON.decode(result.responseText);
