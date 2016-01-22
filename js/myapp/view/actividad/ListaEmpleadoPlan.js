@@ -27,6 +27,12 @@ Ext.define('myapp.view.actividad.ListaEmpleadoPlan', {
 			text: 'Fecha de Asignación',
 			
 		},
+                {
+			flex: 0.5,
+			dataIndex: 'idEmpleado',
+			hidden: true
+			
+		},
             {
 			text:'Foto',
 			dataIndex:'foto',
@@ -60,23 +66,24 @@ Ext.define('myapp.view.actividad.ListaEmpleadoPlan', {
                         xtype: 'label',
                         name: 'lblIdActividad',
                         text: '',
-                        hidden:false
+                        hidden:true
      
                     }, 
                       {
                         xtype: 'label',
                         name: 'lblActividad',
                         text: '',
-                        hidden:false
+                        hidden:true
      
                     }, 
                     {
                         xtype: 'label',
                         name: 'lblEvento',
                         text: '',
-                        hidden:false
+                        hidden:true
      
-                    }
+                    }, 
+                    
                 ]
             }
         

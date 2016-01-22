@@ -519,6 +519,7 @@ class Avance extends CI_Controller {
                     'foto' => $row['foto'],
                     'nombrecompleto' => $row['nombre'] . " " . $row['apellido'],
                     'fecha' => $row['fecha'],
+                      'idEmpleado' => $row['idEm'],
                 );
             }
 

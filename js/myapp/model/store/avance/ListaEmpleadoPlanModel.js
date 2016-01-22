@@ -5,6 +5,7 @@ Ext.define('myapp.model.store.avance.ListaEmpleadoPlanModel', {
          { name: 'foto'}, 
         { name: 'nombrecompleto'}, 
         { name: 'fecha'},
+        { name: 'idEmpleado'},
        
     ] 
 });

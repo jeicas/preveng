@@ -129,7 +129,8 @@ class Avance_model extends CI_Model {
         $sql = "SELECT 
                     bdgenerica.persona.foto AS foto,
                      bdgenerica.persona.nombre AS nombre, 
-                     bdgenerica.persona.apellido AS apellido, 
+                     bdgenerica.persona.apellido AS apellido,
+                     bdgenerica.empleado.id AS idEm,
                      av.fechaasignacion AS fecha
 
              FROM prevengo.avance AS av 
@@ -137,6 +138,7 @@ class Avance_model extends CI_Model {
              INNER JOIN evento ON actividad.evento=evento.id 
              INNER JOIN bdgenerica.usuario ON av.usuario= bdgenerica.usuario.id 
              INNER JOIN bdgenerica.persona ON bdgenerica.usuario.cedula=bdgenerica.persona.cedula 
+             INNER JOIN bdgenerica.empleado ON bdgenerica.usuario.cedula=bdgenerica.empleado.cedula 
              WHERE  av.actividad=$id
              GROUP BY nombre 
              ORDER BY av.fecharegistro ASC";

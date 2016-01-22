@@ -117,9 +117,28 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoAsignarEjecutorController'
         var gridUsu = this.getListaAsignarUsuario();
         var win = this.getWinAsignarUsuario();
         record = gridUsu.getSelectionModel().getSelection();
-  
+      
         if (record[0]) {
-            Ext.Ajax.request({
+            
+               store = grid1.getStore();
+           
+            if (store.data.items.length==0){
+                encontrado = false;
+            }
+            for (i = 0; i < store.data.items.length; i++) {
+                if (record[0].get('idEmpl') == store.data.items[i].data['idEmpleado'])
+                {
+                    encontrado = true;
+                    i = store.data.items.length + 1;
+                } else {
+                    encontrado = false;
+                }
+            }
+            
+            
+            
+             if (!encontrado){
+                   Ext.Ajax.request({
                 url: BASE_URL + 'avance/avance/asignarEmpleado',
                 method: 'POST',
                 params: {
@@ -150,6 +169,12 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoAsignarEjecutorController'
                     Ext.MessageBox.show({title: 'Alerta', msg: data.msg, buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
                 }
             });
+              }else {
+                   Ext.MessageBox.show({title: 'Informaci&oacute;n',
+                msg: 'Este empleado ya se encuentra asignado a este plan',
+                buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.INFO});
+              }
+          
 
         } else {
             Ext.MessageBox.show({title: 'Informaci&oacute;n',
