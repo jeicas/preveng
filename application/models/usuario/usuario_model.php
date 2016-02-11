@@ -16,7 +16,8 @@ class Usuario_model extends CI_Model{
     }
     public function usuariolog($cedula,$nacionalidad){
         $db_generica = $this->load->database('bdgenerica', TRUE);//Inicia la BD generica
-        $sql= " SELECT division.dependencia as departamento FROM empleado, usuario, division WHERE usuario.cedula='$cedula' AND usuario.nacionalidad='$nacionalidad' AND usuario.cedula=empleado.cedula AND usuario.nacionalidad=empleado.nacionalidad and empleado.estatus=1 and empleado.division=division.id limit 1";
+        $sql= "SELECT division.dependencia as departamento FROM empleado, usuario, division WHERE usuario.cedula='$cedula' AND usuario.nacionalidad='$nacionalidad' AND usuario.cedula=empleado.cedula AND usuario.nacionalidad=empleado.nacionalidad and empleado.estatus=1 and empleado.division=division.id limit 1";
+      
         $consulta=$db_generica->query($sql,array($cedula,$nacionalidad));  
         if($consulta->num_rows() ==1)
             return $consulta;
@@ -26,7 +27,7 @@ class Usuario_model extends CI_Model{
    
     function cargarusuario($parametro) {
         $db_generica = $this->load->database('bdgenerica', TRUE);//Inicia la BD generica
-        $query = $db_generica->query("SELECT persona.*, empleado.cedula, empleado.nacionalidad, division.dependencia as departamento, 
+        $query = $db_generica->query("SELECT DISTINCT persona.*, empleado.cedula, empleado.nacionalidad, division.dependencia as departamento, 
         persona.foto,IF(a.estatus='1', 'Activo', 'Inactivo') as status, a.id,a.usuario,a.clave,a.tipousuario,
         division.nombre as dnombre,empleado.cargo,empleado.tiponomina,b.nombre as ntipousuario
         FROM dependencia,persona 
@@ -38,9 +39,8 @@ class Usuario_model extends CI_Model{
         INNER JOIN usuario a
         INNER JOIN tipousuario b ON a.tipousuario=b.id 
         AND a.cedula=empleado.cedula AND a.nacionalidad=empleado.nacionalidad
-        WHERE (dependencia.dependencia=$parametro
-        OR division.dependencia=$parametro) 
         ORDER BY persona.nombre");
+       
         $resultado = array();
         $resultdb=array();  
         if ($query->num_rows() > 0){

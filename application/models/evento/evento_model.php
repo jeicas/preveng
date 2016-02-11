@@ -33,9 +33,11 @@ class Evento_model extends CI_Model {
                              inner join sector on sector.id=evento.sector
                              left join actividad
                                     on actividad.evento=evento.id
+                             left join actividad_usuario on actividad.id=actividad_usuario.actividad
                              left join  bdgenerica.usuario 
-                                    on bdgenerica.usuario.id= actividad.usuario
-                     		left join  bdgenerica.persona 
+                                    on bdgenerica.usuario.id= actividad_usuario.usuario
+                             
+                             left join  bdgenerica.persona 
                                     on bdgenerica.usuario.cedula=bdgenerica.persona.cedula
                             left join bdgenerica.empleado on 
                                          bdgenerica.persona.cedula=bdgenerica.empleado.cedula
@@ -95,14 +97,15 @@ class Evento_model extends CI_Model {
                                     bdgenerica.ente.nombre AS ente,
                                     bdgenerica.division.nombre AS division,
                                     evento.estatus as estatus,
-                                    actividad.usuario as idUsuario
+                                    actividad_usuario.usuario as idUsuario
                                    
                              from evento
                              
                              left join actividad
                                     on actividad.evento=evento.id
+                             left join actividad_usuario on actividad.id=actividad_usuario.actividad
                              left join  bdgenerica.usuario 
-                                    on bdgenerica.usuario.id= actividad.usuario
+                                    on bdgenerica.usuario.id= actividad_usuario.usuario
                      		left join  bdgenerica.persona 
                                     on bdgenerica.usuario.cedula=bdgenerica.persona.cedula
                             left join bdgenerica.empleado on 
@@ -114,7 +117,7 @@ class Evento_model extends CI_Model {
                             left JOIN  bdgenerica.division 
                                      ON bdgenerica.empleado.division= bdgenerica.division.id
                            where evento.estatus in (1,2,4)
-                           group by evento.titulo");
+                           group by evento.id");
 
         return $query;
     }

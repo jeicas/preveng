@@ -65,13 +65,21 @@ Ext.define('myapp.controller.evento.EventoListaController', {
             selector: 'winDescripcionLineamiento'
         },
         {
-            ref: 'ListaAsignarUsuario',
-            selector: 'listaAsignarUsuario'
+            ref: 'ListaAsignarComisionado',
+            selector: 'listaAsignarComisionado'
+        },
+        {
+            ref: 'winLineamientoPorEvento',
+            selector: 'winLineamientoPorEvento'
+        },
+          {
+            ref: 'ListaLineamientoPorEvento',
+            selector: 'listaLineamientoPorEvento'
         },
         //Comisionado
         {
-            ref: 'WinAsignarUsuario',
-            selector: 'winAsignarUsuario'
+            ref: 'WinAsignarComisionado',
+            selector: 'winAsignarComisionado'
         },
         //Reincidencia
         {
@@ -82,13 +90,22 @@ Ext.define('myapp.controller.evento.EventoListaController', {
             ref: 'WinAnexo',
             selector: 'winAnexo'
         },
+         {
+            ref: 'WinReincidenciaEvento',
+            selector: 'winReincidenciaEvento'
+        },
+        {
+            ref: 'ListaReincidenciaEvento',
+            selector: 'ListaReincidenciaEvento'
+        },
     ],
     init: function (application) {
         this.control({
             "listaEventos button[name=btnNuevo]": {
                 click: this.onClickNuevoEvento
-            },
-            //eventos del contenedor de la derecha
+            }, 
+ //==============Funciones contenedor de la derecha=========================================================
+     //==============Lineamientos=================================
             "mainviewport button[name=btnNuevoLineamiento]": {
                 click: this.onClickNuevoLineamiento
             },
@@ -98,20 +115,25 @@ Ext.define('myapp.controller.evento.EventoListaController', {
             "mainviewport button[name=btnEliminarLineamiento]": {
                 click: this.onClickEliminarLineamiento
             },
+              "mainviewport button[name=btnVerLineamientos]": {
+                click: this.onClickVerLineamiento
+            },
             "winDescripcionLineamiento button[name=btnGuardar]": {
                 click: this.onClickGuardarLineamiento
             },
             "winDescripcionLineamiento button[name=btnLimpiar]": {
                 click: this.onClickLimpiarLineamiento
             },
-            //==============Comisionados=======================
+            
+          
+           //==============Comisionados============================
             "mainviewport button[name=btnNuevoComisionado]": {
                 click: this.onClickNuevoComisionado
             },
             "mainviewport button[name=btnEliminarComisionado]": {
                 click: this.onClickEliminarComisionado
             },
-            "listaAsignarUsuario button[name=btnGuardar]": {
+            "listaAsignarComisionado button[name=btnGuardarComisionado]": {
                 click: this.onClickGuardarComisionado
             },
             //========reincidencia======================
@@ -122,6 +144,9 @@ Ext.define('myapp.controller.evento.EventoListaController', {
             "mainviewport button[name=btnNuevoReincidencia]": {
                 click: this.onClickNuevoReincidencia
             },
+             "mainviewport button[name=btnVerReincidencias]": {
+                click: this.onClickVerReincidencia
+            },
             "winReincidencia radiogroup[name=rdgAgregarAnexo]": {
                 change: this.changeRadio
             },
@@ -131,10 +156,12 @@ Ext.define('myapp.controller.evento.EventoListaController', {
             "winReincidencia radiogroup[name=rdgTipoAnexo]": {
                 change: this.changeTipoAnexo
             },
-            //========================================
+   //=====================================================================================
             /*"listaEventos": {
              itemclick: this.onClickVerResumen
              },*/
+            
+            
             "listaEventos actioncolumn[name=ver]": {
                 click: this.onClickVerResumen
             },
@@ -196,14 +223,69 @@ Ext.define('myapp.controller.evento.EventoListaController', {
     },
     //Funciones Botones Viewport east
     // ====================funciones de la ventana listaLineamientoPorEvento================
+     onClickVerLineamiento: function (button, e, options) {
+            viewP = this.getViewport();
+        for (i = 0; i < viewP.items.length; i++) {
+            if (viewP.items.items[i].name == 'regioneste')
+            {
+                val = viewP.items.items[i].setVisible(true);
+                 Evento = val.down('textfield[name=titleEvento]').getValue();
+                 idEvento = val.down('textfield[name=idEvento]').getValue();
+                i = viewP.items.length + 1;
+            }
+        }
+
+        win = Ext.create('myapp.view.evento.WinLineamientoPorEvento');
+        
+        newGrid = win.down('listaLineamientoPorEvento');
+
+        Ext.Ajax.request({//AQUI ENVIO LA DATA 
+            url: BASE_URL + 'lineamiento/lineamiento/buscarLineamiento',
+            method: 'POST',
+            params: {
+                id: idEvento
+            },
+            success: function (result, request) {
+                result = Ext.JSON.decode(result.responseText);
+                if (result.cuanto == 0) {
+                   Ext.MessageBox.show({title: 'Mensaje', msg: "No tiene Lineamientos registrados", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});                  
+                }
+                else {
+                        store = newGrid.getStore();
+                        store.proxy.extraParams.id = idEvento;
+                        store.load();
+                        win.setTitle("Lineamientos del evento: " +Evento);
+                        win.show();
+                     
+                }
+
+               },
+            failure: function (form, action) {
+                var result = action.result;
+
+                Ext.MessageBox.show({title: 'Alerta', msg: "Ha ocurrido un error. Por vuelva a intentarlo, si el problema persiste comuniquese con el administrador", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
+
+            }
+        });
+    },
+    
     onClickNuevoLineamiento: function (button, e, options) {
         nuevoLin = true;
-        var grid = this.getListaEventos();
-        record = grid.getSelectionModel().getSelection();
+         viewP = this.getViewport();
+        for (i = 0; i < viewP.items.length; i++) {
+            if (viewP.items.items[i].name == 'regioneste')
+            {
+                val = viewP.items.items[i].setVisible(true);
+                idEvento = val.down('textfield[name=idEvento]').getValue();
+                titulo = val.down('textfield[name=titleEvento]').getValue();
+                i = viewP.items.length + 1;
+            }
+        }
+        
         win = Ext.create('myapp.view.descripcion.WinDescripcionLineamiento');
         win.setTitle("Nuevo Lineamiento");
-        win.down('textfield[name=txtEvento]').setValue(record[0].get('idEv'));
-        win.down('label[name=lblTitulo]').setText('Defina los Lineamientos para el evento: ' + record[0].get('titulo'));
+        win.down('textfield[name=txtEvento]').setValue(idEvento);
+        win.down('label[name=lblTitulo]').setText('Defina los Lineamientos para el evento: ' + titulo);
         win.show();
     },
     onClickEditarLineamiento: function (button, e, options) {
@@ -339,7 +421,7 @@ Ext.define('myapp.controller.evento.EventoListaController', {
             var loadingMask = new Ext.LoadMask(Ext.getBody(), {msg: "grabando..."});
             loadingMask.show();
             record = grid2.getSelectionModel().getSelection();
-            console.log(record);
+           
             Ext.Ajax.request({//AQUI ENVIO LA DATA 
                 url: BASE_URL + 'lineamiento/lineamiento/actualizarLineamiento',
                 method: 'POST',
@@ -376,7 +458,7 @@ Ext.define('myapp.controller.evento.EventoListaController', {
     //======================Funciones de Comisionado=======================================
 
     onClickNuevoComisionado: function (button, e, options) {
-        win = Ext.create('myapp.view.evento.WinAsignarUsuario');
+        win = Ext.create('myapp.view.evento.WinAsignarComisionado');
         win.setTitle("Nuevo Comisionado");
         win.show();
     },
@@ -450,8 +532,8 @@ Ext.define('myapp.controller.evento.EventoListaController', {
             }
         }
         grid3 = valor;
-        grid2 = this.getListaAsignarUsuario();
-        winU = this.getWinAsignarUsuario();
+        grid2 = this.getListaAsignarComisionado();
+        winU = this.getWinAsignarComisionado();
 
         record1 = grid2.getSelectionModel().getSelection();
         if (record1 != '') {
@@ -470,7 +552,7 @@ Ext.define('myapp.controller.evento.EventoListaController', {
                 }
             }
             if (!encontrado) {
-                var loadingMask = new Ext.LoadMask(Ext.getBody(), {msg: "grabando..."});
+                var loadingMask = new Ext.LoadMask(Ext.getBody(), {msg: "Guardando por favor espere..."});
                 loadingMask.show();
                 Ext.Ajax.request({//AQUI ENVIO LA DATA 
                     url: BASE_URL + 'comisionado/comisionado/registrarComisionado',
@@ -514,7 +596,52 @@ Ext.define('myapp.controller.evento.EventoListaController', {
 
     },
     //===================Funciones Reincidencias=============================================
+   onClickVerReincidencia: function (button, e, options) {
+        viewP = this.getViewport();
+        for (i = 0; i < viewP.items.length; i++) {
+            if (viewP.items.items[i].name == 'regioneste')
+            {
+                val = viewP.items.items[i].setVisible(true);
+                 Evento = val.down('textfield[name=titleEvento]').getValue();
+                 idEvento = val.down('textfield[name=idEvento]').getValue();
+                i = viewP.items.length + 1;
+            }
+        }
 
+        win = Ext.create('myapp.view.evento.WinReincidenciaEvento');
+        
+        newGrid = win.down('listaReincidenciaEvento');
+
+        Ext.Ajax.request({//AQUI ENVIO LA DATA 
+            url: BASE_URL + 'reincidencia/reincidencia/buscarReincidencia',
+            method: 'POST',
+            params: {
+                id: idEvento
+            },
+            success: function (result, request) {
+                result = Ext.JSON.decode(result.responseText);
+                if (result.cuanto == 0) {
+                   Ext.MessageBox.show({title: 'Mensaje', msg: "No tiene Reincidencias registradas", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});                  
+                }
+                else {
+                        store = newGrid.getStore();
+                        store.proxy.extraParams.id = idEvento;
+                        store.load();
+                        win.setTitle("Reincidencias del evento: " +Evento);
+                        win.show();
+                     
+                }
+
+               },
+            failure: function (form, action) {
+                var result = action.result;
+
+                Ext.MessageBox.show({title: 'Alerta', msg: "Ha ocurrido un error. Por vuelva a intentarlo, si el problema persiste comuniquese con el administrador", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
+
+            }
+        });
+
+    },
 
     onClickNuevoReincidencia: function (button, e, options) {
         viewP = this.getViewport();
@@ -696,6 +823,7 @@ Ext.define('myapp.controller.evento.EventoListaController', {
                     win.items.items[i].setVisible(true);
                     win.items.items[i].setTitle('Resumen del evento ' + rec.get('titulo'));
                     win.items.items[i].down('textfield[name=idEvento]').setValue(rec.get('idEv'));
+                    win.items.items[i].down('textfield[name=titleEvento]').setValue(rec.get('titulo'));
                     storeLineamiento = win.items.items[i].items.items[0].items.items[0].getStore();
                     storeComisionado = win.items.items[i].items.items[0].items.items[1].getStore();
                     storeReincidencia = win.items.items[i].items.items[0].items.items[2].getStore();
@@ -895,7 +1023,7 @@ Ext.define('myapp.controller.evento.EventoListaController', {
             });
         }
         else {
-            console.log('Else' + rec.get('estatus'));
+            
             Ext.MessageBox.show({title: 'Informaci&oacute;n',
                 msg: "El Evento " + rec.get('titulo') + " no lo puede completar, porque ha sido " + rec.get('estatus'),
                 buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.INFO});
@@ -908,7 +1036,7 @@ Ext.define('myapp.controller.evento.EventoListaController', {
         grid = this.getListaEventos();
         win = this.getWinEvento();
         if (nuevo) {
-            var loadingMask = new Ext.LoadMask(Ext.getBody(), {msg: "grabando..."});
+            var loadingMask = new Ext.LoadMask(Ext.getBody(), {msg: "Guardando por favor espere..."});
             loadingMask.show();
             Ext.Ajax.request({//AQUI ENVIO LA DATA 
                 url: BASE_URL + 'evento/evento/registrarEvento',

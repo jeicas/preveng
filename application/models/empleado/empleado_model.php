@@ -86,15 +86,25 @@
 
       function obtenerEmpleadosGrid3($cedula,$nacionalidad){
         $db_generica = $this->load->database('bdgenerica', TRUE);//Inicia la BD generica
-        $sql="SELECT persona.*,persona.fechanacimiento as fechanac,persona.telefono1 as tlf1, persona.telefono2 as tlf2,empleado.cedula,empleado.nacionalidad,empleado.cargo,persona.foto,
-        empleado.tiponomina,dependencia.id as departamento,empleado.estatus,dependencia.nombre as dnombre, persona.telefono1, persona.telefono2, municipio.id as municipioid, municipio.nombre as municipionombre, parroquia.id as parroquiaid, parroquia.nombre as parroquianombre, estado.id as estadoid, estado.nombre as estadonombre
-        FROM municipio, estado, parroquia, persona INNER JOIN empleado 
-        ON  persona.cedula= empleado.cedula 
-        INNER JOIN division on division.dependencia = (SELECT dependencia FROM division where id=(select division FROM empleado where cedula=$cedula and nacionalidad='$nacionalidad')) AND persona.nacionalidad=empleado.nacionalidad AND division.id= empleado.division INNER JOIN dependencia 
-        ON dependencia.id= division.dependencia 
-        LEFT JOIN tiponomina ON empleado.tiponomina=tiponomina.id
-        LEFT JOIN cargo ON empleado.cargo=cargo.id where persona.parroquia=parroquia.id and parroquia.municipio=municipio.id and municipio.estado=estado.id          
-        ORDER BY persona.nombre";
+            $sql="SELECT persona.*,persona.fechanacimiento as fechanac,persona.telefono1 as tlf1,
+                        persona.telefono2 as tlf2,empleado.cedula,empleado.nacionalidad,
+                        empleado.cargo,persona.foto,
+                        empleado.tiponomina,dependencia.id as departamento,
+                        empleado.estatus,dependencia.nombre as dnombre, 
+                        division.nombre as nombredivision, division.id as iddivision, 
+                        empleado.fechaingreso, 
+                        persona.telefono1, persona.telefono2, municipio.id as municipioid,
+                        municipio.nombre as municipionombre, parroquia.id as parroquiaid,
+                        parroquia.nombre as parroquianombre, estado.id as estadoid, 
+                        estado.nombre as estadonombre
+            FROM municipio, estado, parroquia, persona 
+            INNER JOIN empleado ON  persona.cedula= empleado.cedula 
+            INNER JOIN division on  persona.nacionalidad=empleado.nacionalidad AND division.id= empleado.division 
+           INNER JOIN dependencia ON dependencia.id= division.dependencia 
+            LEFT JOIN tiponomina ON empleado.tiponomina=tiponomina.id
+            LEFT JOIN cargo ON empleado.cargo=cargo.id where persona.parroquia=parroquia.id and parroquia.municipio=municipio.id and municipio.estado=estado.id          
+            ORDER BY persona.nombre";
+          
         $consulta=$db_generica->query($sql,array($cedula,$nacionalidad));  
         if($consulta->num_rows() >=1)
             return $consulta;
@@ -227,6 +237,8 @@
             empleado.tiponomina,
             dependencia.id as departamento, 
             dependencia.dependencia as departamentoanterior, 
+            division.nombre as nombredivision, division.id as iddivision, 
+            empleado.fechaingreso, 
             persona.foto,
             empleado.estatus as eestatus,
             dependencia.nombre as dnombre 
@@ -234,6 +246,7 @@
             INNER JOIN  empleado ON persona.cedula= empleado.cedula 
             AND persona.nacionalidad=empleado.nacionalidad 
             INNER JOIN  dependencia ON empleado.division= (SELECT id FROM division where division.id= empleado.division )
+             INNER JOIN  division ON dependencia.id=division.dependencia
             INNER JOIN persona as persona2
             LEFT JOIN tiponomina ON empleado.tiponomina=tiponomina.id
             LEFT JOIN cargo  ON empleado.cargo=cargo.id

@@ -14,6 +14,8 @@ class EventoReportes extends CI_Controller {
         $this->load->model('evento/evento_model');
         $this->load->model('tipoEvento/tipoevento_model');
         $this->load->model('actividad/actividad_model');
+        $this->load->model('seguridad/calificacion_model');
+    
     }
 
     public function reportePorTipo() {
@@ -109,29 +111,14 @@ class EventoReportes extends CI_Controller {
 
 
             $avanceTotal = (round($total, 2) / $resultdbd->num_rows);
-
-            if ($avanceTotal > 95 && $avanceTotal <= 100) {
-                $calificacion = 'Excepcional';
-            }
-            if ($avanceTotal > 85 && $avanceTotal <= 95) {
-                $calificacion = 'Destacado';
-            }
-            if ($avanceTotal > 75 && $avanceTotal <= 85) {
-                $calificacion = 'Bueno';
-            }
-            if ($avanceTotal > 75 && $avanceTotal <= 65) {
-                $calificacion = 'Aceptable';
-            }
-            if ($avanceTotal > 50 && $avanceTotal <= 65) {
-                $calificacion = 'Puede Mejorar';
-            }
-            if ($avanceTotal > 35 && $avanceTotal <= 50) {
-                $calificacion = 'Deficiente';
-            }
-            if ($avanceTotal >= 0 && $avanceTotal <= 35) {
-                $calificacion = 'Grave';
-            }
-
+            
+           
+             $calif= $this->calificacion_model->findRango($avanceTotal);
+             if ($calif){
+                 foreach ($calif->result_array() as $valor){
+                      $calificacion = $valor['descripcion'];
+                 }
+             }
 
             $data[] = [
                 'calificacion' => $calificacion,

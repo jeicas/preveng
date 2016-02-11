@@ -41,6 +41,13 @@ Ext.define('myapp.view.Header', {
                             text: 'ADMINISTRADOR',
                             width: 150,
                         },
+                        {
+                            xtype: 'textfield',
+                            name: 'txtidusuario',
+                            margins: '5 0 0 0',
+                            text: 'ids',
+                            hidden:true
+                        },
                     ]
                 },
                 

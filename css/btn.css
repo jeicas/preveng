@@ -153,6 +153,17 @@
 }
 
 
+.price-rise .x-change-cell {
+    background-color: #81F781;
+    color:#0B0B0A;
+}
+.price-fall .x-change-cell {
+    background-color: #E6697A;
+    color:#0B0B0A;
+}
+
+
+
 //colores estatus
 .price-fallPendien .x-change-cell {
     background-color: #70EB7C;

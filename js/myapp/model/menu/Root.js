@@ -21,6 +21,8 @@ idProperty: 'id',
 			name: 'usuario'
 		}, {
 			name: 'tipousuario'
+		}, {
+			name: 'idusuario'
 		}
 	],
 	hasMany: {

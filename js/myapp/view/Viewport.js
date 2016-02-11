@@ -124,6 +124,13 @@ Ext.define('myapp.view.Viewport', {
                                                         margin: '0 0 0 5',
                                                         cls: 'icon-clave',
                                                         iconCls: 'icon-eliminar'
+                                                    },{
+                                                        xtype: 'button',
+                                                        name: 'btnVerLineamientos',
+                                                        tooltip: 'Ver Lineamientos',
+                                                        margin: '0 0 0 5',
+                                                         cls:'icon-clave',
+                                                        iconCls: 'buscar'
                                                     }]
                                             },
                                         ]
@@ -159,6 +166,12 @@ Ext.define('myapp.view.Viewport', {
                                              {
                                                 xtype: 'label',
                                                 text: 'Comisionados',
+                                            },
+                                            {
+                                                xtype: 'textfield',
+                                                fieldLabel: 'Evento:',
+                                                name: 'titleEvento', 
+                                                hidden:true 
                                             },
                                             {
                                                 xtype: 'tbfill'
@@ -234,7 +247,7 @@ Ext.define('myapp.view.Viewport', {
                                                 xtype: 'textfield',
                                                 fieldLabel: 'Evento:',
                                                 name: 'idEvento', 
-                                                hidden:true
+                                                hidden:true 
                                             },
                                             {
                                                 xtype: 'tbfill'
@@ -268,6 +281,13 @@ Ext.define('myapp.view.Viewport', {
                                                         margin: '0 0 0 5',
                                                         cls: 'icon-clave',
                                                         iconCls: 'icon-eliminar'
+                                                    }, {
+                                                        xtype: 'button',
+                                                        name: 'btnVerReincidencias',
+                                                        tooltip: 'Ver Reincidencias',
+                                                        margin: '0 0 0 5',
+                                                       cls: 'icon-clave',
+                                                        iconCls: 'buscar'
                                                     }]
                                             },
                                         ]

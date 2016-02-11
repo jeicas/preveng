@@ -191,11 +191,11 @@ class Evento extends CI_Controller {
                 }
 
                 if ($row['nombre'] == NULL && $row['apellido'] == NULL) {
-                    $nombre = "<font color=#FF0000> Por Asignar </font>";
+                    $nombre = "<font color=#FF0000> POR ASIGNAR </font>";
                     $cedula = $row['cedula'];
                 } else {
-                    $nombre = $row['nombre'] . " " . $row['apellido'];
-                    $cedula = $row['nacionalidad'] . "-" . $row['cedula'];
+                      $nombre = $row['nombre']." ".$row['apellido'];
+                      $cedula = $row['cedula'];
                 }
 
 

@@ -35,6 +35,36 @@ class Actividad extends CI_Controller {
         }
     }
 
+    public function obtenerResponsablePlandeAccion() {
+
+        $evento = $this->input->get('idevento');
+        $resultdbd = array();
+        $resultdbd = $this->actividad_model->cargarResponsablePlandeAccion($evento);
+        if ($resultdbd->num_rows() > 0) {
+            foreach ($resultdbd->result_array() as $row) {
+                $data[] = array(
+                    'foto' => $row['foto'],
+                    'nombrecompleto' => $row['nombrecompleto'],
+                    'fecha' => $row['fecha'],
+                    'idEmpleado' => $row['idEmpleado'],
+                    'idUsuario' => $row['idUsuario'],
+                );
+            }
+
+
+            $output = array(
+                'success' => true,
+                'total' => count($data),
+                'data' => array_splice($data, $this->input->get("start"), $this->input->get("limit"))
+            );
+            echo json_encode($output);
+        } else {
+            echo json_encode(array(
+                "success" => false
+            ));
+        }
+    }
+
 //fin de la funcion
 
     public function buscarUnPlandeAccion($idUsuario) {
@@ -62,30 +92,33 @@ class Actividad extends CI_Controller {
     }
 
 //fin de la funcion
-
     public function aprobarActividad() {
-        $id = $this->input->post('record');
+        $arreglo = $_POST['recordGrid'];
         $estatus = 0;
         $estatusDepende = 1;
+        
+        if (isset($arreglo)) {
+            $records = json_decode($arreglo);
+            foreach ($records as $record1) {
+                $data = array(
+                    'id' => $record1->id,
+                    'estatus' => $estatus,
+                );
+                $dataDepende = array(
+                    'id' => $record1->id,
+                    'estatus' => $estatusDepende,
+                );
 
-        $data = array(
-            'id' => $id,
-            'estatus' => $estatus,
-        );
-        $dataDepende = array(
-            'id' => $id,
-            'estatus' => $estatusDepende,
-        );
+                $dataAvance = array(
+                    'id' => $record1->idAv,
+                    'estatus' => $estatus
+                );
 
-        $dataAvance = array(
-            'id' => $this->input->post('idAvance'),
-            'estatus' => $estatus
-        );
-
-        $resultdbd = $this->actividad_model->cambiarEstatus($data);
-        $resultdbd2 = $this->actividad_model->cambiarEstatusDependientes($dataDepende);
-        $resultdbd3 = $this->avance_model->cambiarEstatus($dataAvance);
-
+                $resultdbd = $this->actividad_model->cambiarEstatus($data);
+                $resultdbd2 = $this->actividad_model->cambiarEstatusDependientes($dataDepende);
+                $resultdbd3 = $this->avance_model->cambiarEstatus($dataAvance);
+            }
+        }
         if ($resultdbd && $resultdbd2 && $resultdbd3) {
             echo json_encode(array(
                 "success" => true,
@@ -201,6 +234,7 @@ class Actividad extends CI_Controller {
                     'descripcion' => $row['descripcion'],
                     'estatus' => $estatus,
                     'fecha' => $row['fecha'],
+                    'idencargado' => $row['idencargado'],
                 );
             }
 
@@ -224,7 +258,7 @@ class Actividad extends CI_Controller {
         $id = $this->input->get('id');
         $user = $this->session->userdata('datasession');
         $usuario = $user['idusuario'];
-        $resultdbd = $this->actividad_model->cargarPlandeAccionDeEvento($id, $usuario);
+        $resultdbd = $this->actividad_model->cargarPlandeAccionDeEvento($id);
 
         if ($resultdbd->num_rows() > 0) {
             foreach ($resultdbd->result_array() as $row) {
@@ -279,10 +313,16 @@ class Actividad extends CI_Controller {
                     'fechaPA' => $row['fechaPA'],
                     'depende' => $depende,
                     'iddepende' => $idDepende,
-                    'meta' =>$row['meta'],
-                    'medida' =>$row['medida'],
+                    'meta' => $row['meta'],
+                    'medida' => $row['medida'],
                     'observacion' => $observacion,
                     'estatus' => $estatus,
+                    'foto' => $row['foto'],
+                    'nombrecompleto' => $row['nombrecompleto'],
+                    'idUsuario' =>  $row['usuario'],
+                    'correo' => $row['correo'],
+                    'cedula' => $row['cedula'],
+                    'idencargado' => $row['responsable'],
                 );
             }
 
@@ -331,21 +371,20 @@ class Actividad extends CI_Controller {
     public function registrarActividad() {
         $user = $this->session->userdata('datasession');
         $usuario = $user['idusuario'];
-
         $descripcion = $this->input->post('txtDescripcion');
-
         $evento = $this->input->post('lblIdEvent');
-
         $fecharegistro = date('Y-m-d');
         $fechaT = $this->input->post('dtfFechaT');
         $fechaPA = $this->input->post('dtfFechaPA');
         $meta = $this->input->post('txtMeta');
         $medida = $this->input->post('txtUnidad');
-
-
-
         $estatusEv = 1;
-
+        
+        $responsable=$this->input->post('usuarioResponsable');
+        $correo= $this->input->post('correo');
+        $nombreEvento=$this->input->post('lblEvent');
+        $nombreResponsable=$this->input->post('nombrecompleto');
+        
 
         $datoAct = $this->actividad_model->buscarIdActividad($evento);
         if ($datoAct->num_rows() > 0) {
@@ -360,7 +399,6 @@ class Actividad extends CI_Controller {
 
                 $datactividad = array(
                     'id' => $row['IdAct'],
-                    'usuario' => $usuario,
                     'evento' => $evento,
                     'descripcion' => $descripcion,
                     'fecharegistro' => $fecharegistro,
@@ -370,6 +408,7 @@ class Actividad extends CI_Controller {
                     'meta' => $meta,
                     'medida' => $medida,
                     'estatus' => $estatus,
+                    'responsable' => $usuario,
                 );
 
                 $dataEvento = array(
@@ -378,6 +417,15 @@ class Actividad extends CI_Controller {
                 );
                 $result = $this->actividad_model->actualizarDataActividad($datactividad);
                 $resultEve = $this->evento_model->cambiarEstatus($dataEvento);
+                 $datactividad2 = array(
+                    'actividad' =>$row['IdAct'],
+                    'usuario' => $responsable,
+                    'fechaasignacion' => date('Y-m-d H:i:s'),
+                );
+
+                $results = $this->actividad_model->guardarActividadUsuario($datactividad2);
+                $this->scriptcorreoprevengo->emailNuevoResponsableActividad($correo, $nombreResponsable, $nombreEvento,$descripcion);
+                
             }
         } else {
             if ($this->input->post('cmbActividadDepende') == '' || $this->input->post('cmbActividadDepende') == null || $this->input->post('cmbActividadDepende') == 'Seleccione') {
@@ -388,7 +436,6 @@ class Actividad extends CI_Controller {
                 $estatus = 6;
             }
             $datactividad = array(
-                'usuario' => $usuario,
                 'evento' => $evento,
                 'descripcion' => $descripcion,
                 'fecharegistro' => $fecharegistro,
@@ -398,19 +445,29 @@ class Actividad extends CI_Controller {
                 'medida' => $medida,
                 'actividadepende' => $depende,
                 'estatus' => $estatus,
+                'responsable' => $usuario,
             );
 
             $dataEvento = array(
                 'id' => $evento,
                 'estatus' => $estatusEv,
             );
-            $result = $this->actividad_model->guardarActividad($datactividad);
+            $resulta = $this->actividad_model->guardarActividad($datactividad);
+            $datactividadusuario = array(
+                'actividad' => $resulta,
+                'usuario' => $responsable,
+                'fechaasignacion' => $fecharegistro,
+            );
+            $result = $this->actividad_model->guardarActividadUsuario($datactividadusuario);
+            $results=$result;
             $resultEve = $this->evento_model->cambiarEstatus($dataEvento);
+            $this->scriptcorreoprevengo->emailNuevoResponsableActividad($correo, $nombreResponsable, $nombreEvento,$descripcion);
+              
         }
 
 
 
-        if ($result and $resultEve) {
+        if ($result and $resultEve and $results) {
             echo json_encode(array(
                 "success" => true,
                 "msg" => "Se Guardo con Éxito." //modificado en la base de datos
@@ -437,6 +494,12 @@ class Actividad extends CI_Controller {
         $meta = $this->input->post('txtMeta');
         $medida = $this->input->post('txtUnidad');
 
+        
+         $responsable=$this->input->post('usuarioResponsable');
+        $correo= $this->input->post('correo');
+        $nombreEvento=$this->input->post('lblEvent');
+        $nombreResponsable=$this->input->post('nombrecompleto');
+        
         if ($this->input->post('cmbActividadDepende') == '' || $this->input->post('cmbActividadDepende') == null || $this->input->post('cmbActividadDepende') == 'Seleccione') {
             $depende = null;
         } else {
@@ -451,10 +514,23 @@ class Actividad extends CI_Controller {
             'meta' => $meta,
             'medida' => $medida,
             'actividadepende' => $depende,
+            
         );
 
         $result = $this->actividad_model->actualizarDataActividad($dataEvento);
+        
+        if ($responsable!=''){
+            $datactividad2 = array(
+                    'actividad' =>$idAc,
+                    'usuario' => $responsable,
+                    'fechaasignacion' => date('Y-m-d H:i:s'),
+                );
 
+                $results = $this->actividad_model->actualizarActividad($datactividad2);
+                $this->scriptcorreoprevengo->emailNuevoResponsableActividad($correo, $nombreResponsable, $nombreEvento,$descripcion);
+        }
+           
+           
         if ($result) {
             echo json_encode(array(
                 "success" => true,
@@ -469,29 +545,36 @@ class Actividad extends CI_Controller {
         }
     }
 
-    public function asignarEmpleado() {
+    /*public function asignarEmpleado() {
 
         $evento = $this->input->post('event');
-        $usuario = $this->input->post('user');
         $estatus = 1;
         $eventN = $this->input->post('evento');
-        $correo = $this->input->post('correo');
-        $nombre = $this->input->post('nombre');
+        $arregloResponsables = $_POST['recordsGrid'];
+
 
         $datactividad = array(
-            'usuario' => $usuario,
             'evento' => $evento,
             'estatus' => $estatus,
         );
-
-
         $result = $this->actividad_model->guardarActividad($datactividad);
 
-        if ($result) {
-            
-             $this->scriptcorreoprevengo->emailNuevoResponsable($correo,$nombre,$eventN);
-            
-            
+        if (isset($arregloResponsables)) {
+            $records = json_decode($arregloResponsables);
+            foreach ($records as $record1) {
+                $datactividad2 = array(
+                    'actividad' => $result,
+                    'usuario' => $record1->id,
+                    'fechaasignacion' => date('Y-m-d H:i:s'),
+                );
+
+                $resultado = $this->actividad_model->guardarActividadUsuario($datactividad2);
+                $this->scriptcorreoprevengo->emailNuevoResponsable($record1->correo, $record1->nombrecompleto, $eventN);
+            }
+        }
+
+
+        if ($resultado) {
             echo json_encode(array(
                 "success" => true,
                 "msg" => "Se Guardo con Éxito." //modificado en la base de datos
@@ -510,26 +593,35 @@ class Actividad extends CI_Controller {
     public function reAsignarEmpleado() {
 
         $evento = $this->input->post('event');
-        $usuario = $this->input->post('user');
-       $eventN = $this->input->post('evento');
-        $correo = $this->input->post('correo');
-        $nombre = $this->input->post('nombre');
+        $eventN = $this->input->post('evento');
+        $arregloResponsables = $_POST['recordsGrid'];
 
-        $datactividad = array(
-            'usuario' => $usuario,
-            'evento' => $evento,
-        );
+        if (isset($arregloResponsables)) {
+            $records = json_decode($arregloResponsables);
+            foreach ($records as $record1) {
 
+                if ($resultad = $this->actividad_model->buscarActividadUsuarioEvento($evento)) {
+                    foreach ($resultad->result_array() as $row) {
+                        $acti = $row['actividad'];
+                    }
+                    $datactividad2 = array(
+                        'actividad' => $acti,
+                        'usuario' => $record1->id,
+                        'fechaasignacion' => date('Y-m-d H:i:s'),
+                    );
 
-        $result = $this->actividad_model->actualizarActividad($datactividad);
+                    $resultado = $this->actividad_model->guardarActividadUsuario($datactividad2);
+                    $this->scriptcorreoprevengo->emailNuevoResponsable($record1->correo, $record1->nombrecompleto, $eventN);
+                }
+            }
+        }
+//$result = $this->actividad_model->actualizarActividadUsuario($datactividad);
 
-        if ($result) {
-            
-             $this->scriptcorreoprevengo->emailNuevoResponsable($correo,$nombre,$eventN);
-            
+        if ($resultado) {
+
             echo json_encode(array(
                 "success" => true,
-                "msg" => "Se reasignó el responsable con Éxito." //modificado en la base de datos
+                "msg" => "Se Guardo con Éxito.." //modificado en la base de datos
             ));
         } else {
 
@@ -538,9 +630,80 @@ class Actividad extends CI_Controller {
                 "msg" => "No se pudo Guardar, por favor verifique los datos suministrados" //no se modifico en la base de datos
             ));
         }
+    }*/
+    
+    
+    
+    
+       public function asignarEmpleado() {
+        $evento = $this->input->post('event');
+        $usuario = $this->input->post('user');
+        $estatus = 1;
+        $eventN = $this->input->post('evento');
+        $correo = $this->input->post('correo');
+        $nombre = $this->input->post('nombre');
+        $datactividad = array(
+            'evento' => $evento,
+            'responsable' => $usuario,
+            'estatus' => $estatus,
+        );
+        $result = $this->actividad_model->guardarActividad($datactividad);
+         $datactividad2 = array(
+                    'actividad' => $result,
+                    'usuario' => $usuario,
+                    'fechaasignacion' => date('Y-m-d H:i:s'),
+                );
+
+                $resultado = $this->actividad_model->guardarActividadUsuario($datactividad2);
+        if ($resultado) {
+             $this->scriptcorreoprevengo->emailNuevoResponsable($correo,$nombre,$eventN);
+            
+            
+            echo json_encode(array(
+                "success" => true,
+                "msg" => "Se Guardo con Éxito." //modificado en la base de datos
+            ));
+        } else {
+            echo json_encode(array(
+                "success" => false,
+                "msg" => "No se pudo Guardar, por favor verifique los datos suministrados" //no se modifico en la base de datos
+            ));
+        }
+    }
+//registrarActividad
+    public function reAsignarEmpleado() {
+        $evento = $this->input->post('event');
+        $usuario = $this->input->post('user');
+        $eventN = $this->input->post('evento');
+        $correo = $this->input->post('correo');
+        $nombre = $this->input->post('nombre');
+       
+        
+        
+        $datactividad = array(
+            'usuario' => $usuario,
+            'evento' => $evento,
+        );
+
+        $result = $this->actividad_model->actualizarActividadUsuario($datactividad);
+         $resulta = $this->actividad_model->actualizarActividadResponsable($datactividad);
+        
+        
+        if ($result && $resulta) {
+             $this->scriptcorreoprevengo->emailNuevoResponsable($correo,$nombre,$eventN);
+            echo json_encode(array(
+                "success" => true,
+                "msg" => "Se reasignó el responsable con Éxito." //modificado en la base de datos
+            ));
+        } else {
+            echo json_encode(array(
+                "success" => false,
+                "msg" => "No se pudo Guardar, por favor verifique los datos suministrados" //no se modifico en la base de datos
+            ));
+        }
     }
 
-//registrarActividad
+
 
     public function obtenerEmpleadosConPlan() {
         $id = $this->input->get('id');

@@ -20,6 +20,7 @@ Ext.define('myapp.view.actividad.ListaPlanEventoAsignarEjecutor', {
             startCollapsed : true
        }],
     store: Ext.create('myapp.store.actividad.PlandeAccionStore'),
+    
    viewConfig: {
         getRowClass: function (record, index) {
             var c = record.get('estatus');
@@ -50,7 +51,7 @@ Ext.define('myapp.view.actividad.ListaPlanEventoAsignarEjecutor', {
 
         }
     },
-    //selType: 'checkboxmodel',
+    
     columnLines: true,
     initComponent: function () {
         var me = this;

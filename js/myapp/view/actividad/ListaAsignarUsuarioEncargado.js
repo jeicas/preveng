@@ -1,7 +1,7 @@
-Ext.define('myapp.view.avance.ListaAsignarUsuario', {
+Ext.define('myapp.view.actividad.ListaAsignarUsuarioEncargado', {
     extend: 'Ext.grid.Panel',
-    alias: 'widget.listaAsignarUsuario',
-    itemId: 'listaAsignarUsuario',
+    alias: 'widget.listaAsignarUsuarioEncargado',
+    itemId: 'listaAsignarUsuarioEncargado',
     requires: [
         'Ext.selection.CellModel',
         'Ext.selection.CheckboxModel',
@@ -13,8 +13,9 @@ Ext.define('myapp.view.avance.ListaAsignarUsuario', {
         local: true
 	}], 
     store: Ext.create('myapp.store.usuario.UsuarioStore'),
-    emptyText: 'No hay empleado(s) asignado(s) a esta actividad',
+    emptyText: 'No hay comisionado asignado(s) a este Evento',
     columnLines: true,
+     //selType: 'checkboxmodel',
     initComponent: function () {
         var me = this;
         me.columns = me.buildColumns();
@@ -22,9 +23,9 @@ Ext.define('myapp.view.avance.ListaAsignarUsuario', {
         me.callParent();
     },
     buildColumns: function () {
-        return [  {
+        return [   {
             xtype: 'rownumberer'
-        }, 
+        },
              {
 			text:'',
 			dataIndex:'id',
@@ -34,7 +35,7 @@ Ext.define('myapp.view.avance.ListaAsignarUsuario', {
             {
 			text:'Foto',
 			dataIndex:'foto',
-			flex: 0.3,
+			flex: 0.4,
 			renderer: function(value, metadata, record){
 				return '<img width="50" height="50" src="../../empleados/_DSC'+ value +'">';
 		   }
@@ -119,12 +120,12 @@ Ext.define('myapp.view.avance.ListaAsignarUsuario', {
 			
 		},
                  {
-			flex: 1,
+			flex: 0.8,
 			dataIndex: 'division',
 			text: 'Division',
                         items    : {
 				xtype: 'textfield',
-				flex : 1,
+				flex : 0.8,
 				margin: 2,
 				enableKeyEvents: true,
 				listeners: {
@@ -181,21 +182,18 @@ Ext.define('myapp.view.avance.ListaAsignarUsuario', {
                 store: this.store,
                 displayInfo: true,
                   items:[
-                      
                        {
                         xtype: 'button',
                         name: 'btnGuardar',
                         text: 'Guardar',
                         iconCls: 'save'
-                    },
-                     {
-                        xtype: 'label',
-                        name: 'lblIdActividad',
-                        text: '',
-                        hidden:true
-     
-                    }  
-                             
+                    }, 
+                    
+                        {
+                        xtype: 'textfield',
+                        name: 'txtEvento',
+                       
+                    }      
                     
                 ]
             },

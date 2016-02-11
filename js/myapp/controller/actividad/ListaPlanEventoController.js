@@ -1,5 +1,5 @@
 var nuevoPlan = false;
-var tieneDepende=null;
+var tieneDepende = null;
 Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
     extend: 'Ext.app.Controller',
     views: ['actividad.ListaPlanEvento',
@@ -25,8 +25,13 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
         {
             ref: 'WinObservacionActividad',
             selector: 'winObservacionActividad'
-        }
-
+        }, {
+            ref: 'ListaAsignarResponsableActividad',
+            selector: 'listaAsignarResponsableActividad'
+        }, {
+            ref: 'WinAsignarResponsableActividad',
+            selector: 'winAsignarResponsableActividad'
+        }, 
     ],
     init: function (application) {
         this.control({
@@ -39,7 +44,7 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
             "listaPlanEvento button[name=btnCancelarPlan]": {
                 click: this.onClickCancelarPlan
             },
-             "listaPlanEvento": {
+            "listaPlanEvento": {
                 itemdblclick: this.onClickVerObservacion
             },
             "winActividad button[name=btnGuardar]": {
@@ -48,8 +53,17 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
             "winActividad checkboxfield[name=cbfDepende]": {
                 change: this.cargarActividad
             },
+            "winActividad button[name=btnAsignarResponsable]": {
+                click: this.onClickAsignarResponsable
+            },
+             "winActividad combobox[name=cmbActividadDepende]": {
+                select: this.onClickCambiarId
+            },
             "winObservacionActividad button[name=btnGuardar]": {
                 click: this.onClickGuardarObservacionCancelar
+            },
+            "listaAsignarResponsableActividad button[name=btnGuardarResponsableActividad]": {
+                click: this.onClickSeleccionarEmpleado
             },
         });
     },
@@ -66,43 +80,48 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
 
     onClickEditarPlan: function (button, e, options) {
         nuevoPlan = false;
-        var grid = this.getListaPlanEvento(),
-                record = grid.getSelectionModel().getSelection();
-
+        var grid = this.getListaPlanEvento();
+        record = grid.getSelectionModel().getSelection();
         if (record[0]) {
-             if (record[0].get('estatus') == 'Sin Iniciar'
-                    || record[0].get('estatus') == 'En Espera') {
-              
-            var editWindow = Ext.create('myapp.view.actividad.WinActividad');
-            editWindow.setTitle("Actualizar Actividad");
-            editWindow.down('textfield[name=descripcion]').setValue(record[0].get('descripcion'));
-            editWindow.down('textfield[name=dtfFechaT]').setValue(record[0].get('fecha'));
-            editWindow.down('textfield[name=dtfFechaPA]').setValue(record[0].get('fechaPA'));
-            editWindow.down('combobox[name=cmbActividadDepende]').setValue(record[0].get('depende'));
-            editWindow.down('numberfield[name=meta]').setValue(record[0].get('meta'));
-            editWindow.down('textfield[name=medida]').setValue(record[0].get('medida'));
-            editWindow.show();
-            if (record[0].get('depende')!='null'){
-                tieneDepende=record[0].get('iddepende');
-                
+            if (record[0].get('estatus') == 'Sin Iniciar'
+                    || record[0].get('estatus') == 'En Espera') {   
+                var editWindow = Ext.create('myapp.view.actividad.WinActividad');
+                editWindow.setTitle("Actualizar Actividad");
+                editWindow.down('textfield[name=descripcion]').setValue(record[0].get('descripcion'));
+                editWindow.down('textfield[name=dtfFechaT]').setValue(record[0].get('fecha'));
+                editWindow.down('textfield[name=dtfFechaPA]').setValue(record[0].get('fechaPA'));
+                editWindow.down('combobox[name=cmbActividadDepende]').setValue(record[0].get('depende'));
+                editWindow.down('numberfield[name=meta]').setValue(record[0].get('meta'));
+                editWindow.down('textfield[name=medida]').setValue(record[0].get('medida'));
+                editWindow.down('textfield[name=txtCedula]').setValue(record[0].get('cedula'));
+               
+                editWindow.down('textfield[name=txtNombreCompleto]').setValue(record[0].get('nombrecompleto'));
+                if (record[0].get('foto')){
+                var img = editWindow.down('image');
+                 img.setSrc(BASE_PATH+'./empleados/_DSC' + record[0].get('foto'));
             }
-                
-             else {tieneDepende=null;}
+                editWindow.show();
+                if (record[0].get('iddepende')!= 'null') {
+                    editWindow.down('textfield[name=idActiDepende]').setValue(record[0].get('iddepende'));
+                }
+                else {
+                     editWindow.down('textfield[name=idActiDepende]').setValue(null);
+                }
             }
-            
-             else {
+
+            else {
                 Ext.MessageBox.show({title: 'Informaci&oacute;n',
                     msg: "El Plan " + record[0].get('descripcion') + " no lo puede editar, porque su estatus es: " + record[0].get('estatus'),
                     buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.INFO});
             }
-           
+
         }
         else {
             Ext.MessageBox.show({title: 'Informaci&oacute;n',
                 msg: 'Debe seleccionar el evento que desea editar',
                 buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.INFO});
         }
-       
+
     }, // fin de la function
 
 
@@ -123,7 +142,7 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
                         if (buttonId == 'yes') {
                             var win = Ext.create('myapp.view.observacion.WinObservacionActividad');
                             win.setTitle("Cancelar la actividad " + record[0].get('descripcion'));
-                            win.down('label[name=lblDescripcion]').setText("Indique la razón por la que desea cancelar el plan de accción " + record[0].get('descripcion')+"?");
+                            win.down('label[name=lblDescripcion]').setText("Indique la razón por la que desea cancelar el plan de accción " + record[0].get('descripcion') + "?");
                             win.show();
                         }
                     }
@@ -143,32 +162,35 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
         }
 
     },
-    
-      onClickVerObservacion: function (record, item, index, e, eOpts) {
-         
-               if (item.data.estatus=='Cancelado')
-               {
-                    var win = Ext.create('myapp.view.observacion.WinObservacionAvanceRechazad');
-                    win.setTitle("Observacion: ");
-                    win.down("label[name=lblDescripcion]").setText('Actividad '+item.data.descripcion+' ha sido CANCELADA por: ');
-                    win.down("textareafield[name=txtDescripcion]").setValue(item.data.observacion);
-                    win.down("textareafield[name=txtDescripcion]").setReadOnly(true);
-                    win.show()
-               }else {
-                    Ext.MessageBox.show({title: 'Alerta', msg: "No tiene observaciones registradas", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
-                   
-               }
+    onClickVerObservacion: function (record, item, index, e, eOpts) {
+
+        if (item.data.estatus == 'Cancelado')
+        {
+            var win = Ext.create('myapp.view.observacion.WinObservacionAvanceRechazad');
+            win.setTitle("Observacion: ");
+            win.down("label[name=lblDescripcion]").setText('Actividad ' + item.data.descripcion + ' ha sido CANCELADA por: ');
+            win.down("textareafield[name=txtDescripcion]").setValue(item.data.observacion);
+            win.down("textareafield[name=txtDescripcion]").setReadOnly(true);
+            win.show()
+        } else {
+            Ext.MessageBox.show({title: 'Alerta', msg: "No tiene observaciones registradas", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
+
+        }
     },
 //=======================Funciones del WinActividad=========================================
     onClickGuardarPlan: function (button, e, options) {
-
+              
         win = this.getWinActividad();
         grid = this.getListaPlanEvento();
         if (win.down("textfield[name=descripcion]").getValue() == '') {
             Ext.MessageBox.show({title: 'Alerta', msg: "Ingrese la descripcion del plan", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
         }
         else {
+              var loadingMask = new Ext.LoadMask(Ext.getBody(), {msg: "Guardando por Favor espere..."});
+                loadingMask.show();
             if (nuevoPlan) {
+         
+                valor= win.down("textfield[name=idActiDepende]").getValue();
                
                 Ext.Ajax.request({//AQUI ENVIO LA DATA 
                     url: BASE_URL + 'actividad/actividad/registrarActividad',
@@ -180,17 +202,23 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
                                 txtUnidad: win.down("textfield[name=medida]").getValue(),
                                 dtfFechaT: win.down("textfield[name=dtfFechaT]").getValue(),
                                 dtfFechaPA: win.down("textfield[name=dtfFechaPA]").getValue(),
-                                cmbActividadDepende: win.down("combobox[name=cmbActividadDepende]").getValue(),
+                                cmbActividadDepende: valor,
                                 lblIdEvent: grid.down("label[name=lblIdEvento]").getEl().dom.textContent,
+                                usuarioResponsable:win.down("textfield[name=idUsuario]").getValue(),
+                                correo:win.down("textfield[name=correo]").getValue(),
+                                lblEvent:grid.down("label[name=lblEvento]").getEl().dom.textContent,
+                                nombrecompleto:win.down("textfield[name=txtNombreCompleto]").getValue(),
+                            
                             },
                     success: function (result, request) {
                         result = Ext.JSON.decode(result.responseText);
-                     
+
                         if (result.success) {
                             grid.getView().refresh();
                             grid.getStore().load();
                             Ext.MessageBox.show({title: 'Alerta', msg: result.msg, buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
                             win.close();
+                           loadingMask.hide();
 
                         }
                         else {
@@ -200,7 +228,7 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
                     },
                     failure: function (form, action) {
                         var result = action.result;
-                       
+
                         Ext.MessageBox.show({title: 'Alerta', msg: "Ha ocurrido un error. Por vuelva a intentarlo, si el problema persiste comuniquese con el administrador", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
                     }
 
@@ -208,24 +236,23 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
             }
             else
             {
-             
+
                 record = grid.getSelectionModel().getSelection();
-                
-                if (tieneDepende!=null)
+                  valor= win.down("textfield[name=idActiDepende]").getValue();
+                if (valor != null || valor != '')
                 {
-                    if (tieneDepende==win.down("combobox[name=cmbActividadDepende]").getValue()){
-                        ActividadDependiente=tieneDepende
-                    }else 
+                    if (valor == win.down("combobox[name=cmbActividadDepende]").getValue()) {
+                        ActividadDependiente = valor;
+                    } else
                     {
-                         ActividadDependiente=win.down("combobox[name=cmbActividadDepende]").getValue();
-                    } 
+                        ActividadDependiente =valor;
+                    }
                 }
                 else {
-                    
-                    ActividadDependiente=win.down("combobox[name=cmbActividadDepende]").getValue();
+
+                    ActividadDependiente = valor;
                 }
-                
-              
+
                 Ext.Ajax.request({//AQUI ENVIO LA DATA 
                     url: BASE_URL + 'actividad/actividad/actualizarActividad',
                     method: 'POST',
@@ -238,31 +265,38 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
                                 txtMeta: win.down("numberfield[name=meta]").getValue(),
                                 txtUnidad: win.down("textfield[name=medida]").getValue(),
                                 cmbActividadDepende: ActividadDependiente,
+                                usuarioResponsable:win.down("textfield[name=idUsuario]").getValue(),
+                                correo:win.down("textfield[name=correo]").getValue(),
+                                lblEvent:grid.down("label[name=lblEvento]").getEl().dom.textContent,
+                                nombrecompleto:win.down("textfield[name=txtNombreCompleto]").getValue(),
                             },
                     success: function (result, request) {
                         result = Ext.JSON.decode(result.responseText);
-                       
+
 
                         if (result.success) {
                             grid.getView().refresh();
                             grid.getStore().load();
                             Ext.MessageBox.show({title: 'Alerta', msg: result.msg, buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
                             win.close();
+                             loadingMask.hide();
 
                         }
                         else {
                             Ext.MessageBox.show({title: 'Alerta', msg: result.msg, buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
                             // myapp.util.Util.showErrorMsg(result.msg);
+                            loadingMask.hide();
                         }
                     },
                     failure: function (form, action) {
-                        var result = action.result;
-                       
+                        var result = action.result
                         Ext.MessageBox.show({title: 'Alerta', msg: "Ha ocurrido un error. Por vuelva a intentarlo, si el problema persiste comuniquese con el administrador", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
+                         loadingMask.hide();
                     }
 
                 });
             }
+           
         }
 
 
@@ -308,9 +342,8 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
 
         grid = this.getListaPlanEvento();
         winO = this.getWinObservacionActividad();
-
-        var loadingMask = new Ext.LoadMask(Ext.getBody(), {msg: "grabando..."});
-        loadingMask.show();
+          var loadingMask = new Ext.LoadMask(Ext.getBody(), {msg: "Guardando por favor espere..."});
+            loadingMask.show();
 
         record = grid.getSelectionModel().getSelection();
 
@@ -323,14 +356,14 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
             },
             success: function (result, request) {
                 result = Ext.JSON.decode(result.responseText);
-                loadingMask.hide();
+               
 
                 if (result.success) {
                     grid.getView().refresh();
                     grid.getStore().load();
                     winO.close();
                     Ext.MessageBox.show({title: 'Alerta', msg: result.msg, buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
-
+                    loadingMask.hide();
                 }
                 else {
                     Ext.MessageBox.show({title: 'Alerta', msg: result.msg, buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
@@ -346,5 +379,43 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoController', {
         });
 
 
+    },
+    onClickAsignarResponsable: function () {
+        winEmp = Ext.create('myapp.view.actividad.WinAsignarResponsableActividad');
+        winEmp.show();
+    },
+    onClickSeleccionarEmpleado: function () {
+
+        winEmp = this.getWinAsignarResponsableActividad();
+        win = this.getWinActividad();
+
+        var grid = this.getListaAsignarResponsableActividad();
+        record = grid.getSelectionModel().getSelection();
+
+        if (record[0]) {
+          
+            win.down('textfield[name=txtCedula]').setValue(record[0].get('cedula'));
+            win.down('textfield[name=txtNombreCompleto]').setValue(record[0].get('nombrecompleto'));
+            win.down('textfield[name=correo]').setValue(record[0].get('correo'));
+            win.down('textfield[name=idUsuario]').setValue(record[0].get('id'));
+
+            if (record[0].get('foto')) {
+                var img = win.down('image');
+                img.setSrc(BASE_PATH + './empleados/_DSC' + record[0].get('foto'));
+            }
+        } else {
+            Ext.MessageBox.show({title: 'Alerta', msg: "Debe seleccionar un Empleado", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
+
+        }
+
+
+
+        winEmp.close();
+
+    },
+      onClickCambiarId: function () {
+            win = this.getWinActividad();
+            valor=win.down('combobox[name=cmbActividadDepende]').getValue();
+            win.down('textfield[name=idActiDepende]').setValue(valor);
     },
 });

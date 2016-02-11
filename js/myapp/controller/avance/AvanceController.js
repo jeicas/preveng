@@ -50,10 +50,10 @@ Ext.define('myapp.controller.avance.AvanceController', {
             "#gridListaAvance": {
                 itemdblclick: this.onClickVerObservacion
             },
-             "#formAvance radiogroup[name=rdgAgregarAnexo]": {
+            "#formAvance radiogroup[name=rdgAgregarAnexo]": {
                 change: this.changeRadio
             },
-             "#formAvance radiogroup[name=rdgTipoAnexo]": {
+            "#formAvance radiogroup[name=rdgTipoAnexo]": {
                 change: this.changeTipoAnexo
             },
         });
@@ -74,7 +74,7 @@ Ext.define('myapp.controller.avance.AvanceController', {
                 else {
                     var win = Ext.create('myapp.view.avance.Gridbuscar');
                     win.setTitle("Nuevo Avance");
-                     win.down('button[name=btnGuardar]').setVisible(false);
+                    win.down('button[name=btnGuardar]').setVisible(false);
                     nuevo = true;
                     win.show();
                 }
@@ -117,7 +117,9 @@ Ext.define('myapp.controller.avance.AvanceController', {
                         win.down('label[name=lblNombreEvento]').setText(record[0].get('evento'));
                         win.down('label[name=lblFechaAsignacion]').setText(record[0].get('fechaAsignacion'));
                         win.down('numberfield[name=txtCosto]').setValue(record[0].get('costo'));
-
+                        win.down('label[name=lblUnidad]').setText(record[0].get('unidad'));
+                        win.down('label[name=lblMeta]').setText(record[0].get('meta'));
+                        win.down('textfield[name=txtmetalograda]').setValue(record[0].get('metalograda'));
                         nuevo = false;
                         win.show();
                     }
@@ -143,7 +145,7 @@ Ext.define('myapp.controller.avance.AvanceController', {
         formulario = this.getAvance();
         grid = this.getGridListaAvance();
         win = this.getGridbuscar();
-        var loadingMask = new Ext.LoadMask(Ext.getBody(), {msg: "grabando..."});
+        var loadingMask = new Ext.LoadMask(Ext.getBody(), {msg: "Guardando por Favor espere..."});
         loadingMask.show();
         if (nuevo) {
             formulario.getForm().submit({//AQUI ENVIO LA DATA 
@@ -229,15 +231,16 @@ Ext.define('myapp.controller.avance.AvanceController', {
         formulario = this.getAvance();
         storeAct = formulario.down("combobox[name=cmbActividad]").getStore();
         valor = formulario.down("combobox[name=cmbActividad]").getValue();
-
+     
         for (i = 0; i < storeAct.data.items.length; ++i)
         {
+            
             if (storeAct.data.items[i].data['id'] == valor) {
                 formulario.down("label[name=lblFechaAsignacion]").setText(storeAct.data.items[i].data['fecha']);
                 formulario.down("label[name=lblNombreEvento]").setText(storeAct.data.items[i].data['evento']);
                 formulario.down("label[name=lblMeta]").setText(storeAct.data.items[i].data['meta']);
-                 formulario.down("label[name=lblUnidad]").setText(storeAct.data.items[i].data['medida']);
-                i = length + 1;
+                formulario.down("label[name=lblUnidad]").setText(storeAct.data.items[i].data['medida']);
+                i = storeAct.data.items.length + 1;
             }
 
         }
@@ -248,7 +251,7 @@ Ext.define('myapp.controller.avance.AvanceController', {
         Ext.Ajax.request({//AQUI ENVIO LA DATA 
             url: BASE_URL + 'avance/avance/buscarUsuario',
             method: 'POST',
-            params: {idUsuario:item.data.idUs },
+            params: {idUsuario: item.data.idUs},
             success: function (result, request) {
                 result = Ext.JSON.decode(result.responseText);
 
@@ -257,22 +260,22 @@ Ext.define('myapp.controller.avance.AvanceController', {
                     Ext.MessageBox.show({title: 'Mensaje', msg: "No tiene privilegios para esta acción.", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
                 }
                 else {
-                if (item.data.estatus == 'Rechazado') {
-                    
-                    
-                    var win = Ext.create('myapp.view.observacion.WinObservacionAvanceRechazad');
-                    win.setTitle("Observacion: ");
-                    win.down("label[name=lblDescripcion]").setText('Su avance ha sido rechazado.');
-                    win.down("textareafield[name=txtDescripcion]").setValue(item.data.observacion);
-                    win.down("textareafield[name=txtDescripcion]").setReadOnly(true);
-                    win.show();
-                } else
-                {
-                    Ext.MessageBox.show({title: 'Mensaje', msg: "No tiene observaciones.", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
+                    if (item.data.estatus == 'Rechazado') {
 
+
+                        var win = Ext.create('myapp.view.observacion.WinObservacionAvanceRechazad');
+                        win.setTitle("Observacion: ");
+                        win.down("label[name=lblDescripcion]").setText('Su avance ha sido rechazado.');
+                        win.down("textareafield[name=txtDescripcion]").setValue(item.data.observacion);
+                        win.down("textareafield[name=txtDescripcion]").setReadOnly(true);
+                        win.show();
+                    } else
+                    {
+                        Ext.MessageBox.show({title: 'Mensaje', msg: "No tiene observaciones.", buttons: Ext.MessageBox.OK, icon: Ext.MessageBox.WARNING});
+
+                    }
                 }
-              }
-                
+
             },
             failure: function (form, action) {
                 var result = action.result;
@@ -289,9 +292,9 @@ Ext.define('myapp.controller.avance.AvanceController', {
 
 
     },
-     changeRadio: function (grupo, cmp) {
+    changeRadio: function (grupo, cmp) {
         win = this.getAvance();
-        win1= this.getGridbuscar();
+        win1 = this.getGridbuscar();
         if (cmp.seleccionAgregar == 1)
         {
             win1.setHeight(550);
@@ -299,7 +302,7 @@ Ext.define('myapp.controller.avance.AvanceController', {
             win.down('fieldset[name=formAnexo]').setVisible(true);
             win.down('textfield[name=txtDireccion]').setVisible(false);
             win.down('filefield[name=txtArchivo]').setVisible(false);
-          
+
         }
         else {
             win.down('button[name=btnGuardar]').setVisible(true);
@@ -307,13 +310,12 @@ Ext.define('myapp.controller.avance.AvanceController', {
             win1.setHeight(440);
         }
     },
-    
-        changeTipoAnexo: function (grupo, cmp) {
+    changeTipoAnexo: function (grupo, cmp) {
         win = this.getAvance();
-       
+
         if (cmp.seleccion == 1)
         {
-           
+
             win.down('button[name=btnGuardar]').setVisible(true);
             win.down('textfield[name=txtDireccion]').setVisible(true);
             win.down('filefield[name=txtArchivo]').setVisible(false);

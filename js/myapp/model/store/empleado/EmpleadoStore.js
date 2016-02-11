@@ -21,6 +21,12 @@ Ext.define('myapp.model.store.empleado.EmpleadoStore', {
         { name: 'nombredepartamento', type: 'string'},
         { name: 'cmbdepartamento', type: 'int'},
         { name: 'departamentoUsuario', type: 'int'},
-        { name: 'departamentoanterior', type: 'int'}
+        { name: 'departamentoanterior', type: 'int'}, 
+         {name: 'fechaingreso'},
+        {name: 'cmbdependencia'},
+        {name: 'cmbdivision'},
+        {name: 'dependencia'},
+        {name: 'division'},
+
     ]
 });

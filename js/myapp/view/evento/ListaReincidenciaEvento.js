@@ -56,35 +56,7 @@ Ext.define('myapp.view.evento.ListaReincidenciaEvento', {
     },
    
     buildDockedItems: function () {
-        return [{
-                xtype: 'toolbar',
-                dock: 'top',
-                store: this.store,
-                displayInfo: true,
-                  items:[
-                     {  
-                        xtype: 'button',
-                        name: 'btnNuevoReincidencia',
-                        text: 'Nuevo',
-                        iconCls: 'useradd'
-                    },{  
-                        xtype: 'button',
-                        name: 'btnEliminarReincidencia',
-                        text: 'Eliminar',
-                        iconCls: 'icon-eliminar'
-                    },
-                    
-                     {
-                        xtype: 'label',
-                        name: 'lblIdActividad',
-                        text: '',
-       
-                        hidden:true
-     
-                       
-                    }
-                ]
-            },
+        return [
                 {
                 xtype: 'pagingtoolbar',
                 dock: 'bottom',

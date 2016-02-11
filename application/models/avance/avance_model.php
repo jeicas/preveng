@@ -46,41 +46,59 @@ class Avance_model extends CI_Model {
         return $boll;
     }
 
-    public function consultarListaAvance() {
+    public function consultarListaAvance($usuario) {
+        $sql1 = "SELECT actividad FROM avance where usuario=$usuario";
+        $query1 = $this->db->query($sql1);
+        if ($query1->num_rows() > 0) {
+            if ($query1->num_rows() > 1) {
+                $i = 0;
+                foreach ($query1->result_array() as $act) {
+                    if ($i == 0) {
+                        $condici = $act['actividad'];
+                    } else {
+                        $condici = $condici . ',' . $act['actividad'];
+                    }
+                    $i = $i + 1;
+                }
+            } else {
+                $act = $query1->result_array();
+                $condici = $act['actividad'];
+            }
+            $condicion = '(' . $condici . ')';
+            $sql = "SELECT av.id AS id,
+              av.descripcion AS descripcion,
+              evento.titulo AS evento,
+              actividad.descripcion AS actividad,
+              av.id AS idAvance,
+              av.meta AS meta,
+              av.actividad AS idActividad,
+              av.tipo AS tipo,
+              av.fecharegistro AS fecha,
+              av.fechaasignacion AS fechaAsig,
+              av.costo AS costo,
+              av.observacion AS observacion,
+              av.estatus AS estatus,
+              actividad.meta as metaact,
+              actividad.medida as unidad,
+              anexo.direccion as anexo,
+              anexo.tipoarchivo as extension,
+              bdgenerica.usuario.id AS idUs,
+              bdgenerica.persona.nombre AS nombre,
+              bdgenerica.persona.apellido AS apellido
+              FROM prevengo.avance as av
+              INNER JOIN actividad ON actividad.id= av.actividad
+              INNER JOIN evento ON actividad.evento=evento.id
 
-        $sql = "SELECT av.descripcion AS descripcion, 
-                     evento.titulo AS evento, 
-                     actividad.descripcion AS actividad,
-                     av.id AS idAvance, 
-                     av.meta AS meta,
-                     av.actividad AS idActividad, 
-                     av.tipo AS tipo,
-                     av.fecharegistro AS fecha, 
-                     av.fechaasignacion AS fechaAsig, 
-                     av.costo AS costo, 
-                     av.observacion AS observacion,
-                     av.estatus AS estatus,
-                     anexo.direccion as anexo,
-                     anexo.tipoarchivo as extension,
-                     bdgenerica.usuario.id AS idUs,
-                     bdgenerica.persona.nombre AS nombre, 
-                     bdgenerica.persona.apellido AS apellido 
-
-                FROM prevengo.avance as av 
-                INNER JOIN actividad ON actividad.id= av.actividad 
-                INNER JOIN evento ON actividad.evento=evento.id 
-                INNER JOIN bdgenerica.usuario ON av.usuario= bdgenerica.usuario.id 
-                LEFT JOIN anexo on av.id =anexo.avance
-                INNER JOIN bdgenerica.persona ON bdgenerica.usuario.cedula=bdgenerica.persona.cedula
-                WHERE av.estatus !=1    
-                ORDER BY av.fecharegistro, av.tipo ASC
-
-";
-
-
-        $query = $this->db->query($sql);
-
-        return $query;
+              INNER JOIN bdgenerica.usuario ON av.usuario= bdgenerica.usuario.id
+              LEFT JOIN anexo on av.id =anexo.avance
+              INNER JOIN bdgenerica.persona ON bdgenerica.usuario.cedula=bdgenerica.persona.cedula
+              WHERE av.estatus !=1    and av.actividad IN $condicion
+              GROUP BY av.id
+              ORDER BY av.fecharegistro, av.tipo ASC";
+            $query = $this->db->query($sql);
+            return $query;
+        } else
+            return $query1;
     }
 
     public function sumTotalMetaAvance($idactividad) {

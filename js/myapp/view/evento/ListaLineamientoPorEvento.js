@@ -47,35 +47,6 @@ Ext.define('myapp.view.evento.ListaLineamientoPorEvento', {
                 items: [
                 ]
             },
-
-        {
-
-                xtype: 'toolbar',
-                dock: 'top',
-                store: this.store,
-                displayInfo: true,
-                  items:[{
-                        xtype: 'button',
-                        name: 'btnNuevoLineamiento',
-                        text: 'Nuevo',
-                        
-                        iconCls: 'useradd'
-                    },
-                    {
-                        xtype: 'button',
-                        name: 'btnEditarLineamiento',
-                        text: 'Editar',
-                       
-                        iconCls: 'useredit'
-                    },
-                     {
-                        xtype: 'button',
-                        name: 'btnEliminarLineamiento',
-                        text: 'Eliminar',
-                        
-                        iconCls: 'icon-eliminar'
-                    }
-                ]
-            }];
+];
     }
 });

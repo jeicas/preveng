@@ -1,13 +1,13 @@
-Ext.define('myapp.view.avance.WinAsignarUsuario', {
+Ext.define('myapp.view.avance.WinAsignarUsuarioAv', {
 extend: 'Ext.window.Window',
-  alias: 'widget.winAsignarUsuario',
-  itemId: 'winAsignarUsuario',
+  alias: 'widget.winAsignarUsuarioAv',
+  itemId: 'winAsignarUsuarioAv',
   title:'Usuarios',
   height: 510,
   width: 900,
   modal:true,
   requires: [
-   'myapp.view.avance.ListaAsignarUsuario'
+   'myapp.view.avance.ListaAsignarUsuarioAv'
   ],
   layout: {
    	type: 'fit'
@@ -20,7 +20,7 @@ extend: 'Ext.window.Window',
   },
   buildItem : function(){
     return [{
-      xtype: 'listaAsignarUsuario',
+      xtype: 'listaAsignarUsuarioAv',
     }]
   },
   buildDockedItems : function(){

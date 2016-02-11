@@ -21,6 +21,8 @@ extend: 'Ext.data.Model',
 		name: 'usuario'
 	}, {
 		name: 'tipousuario'
+	}, {
+		name: 'idusuario'
 	}],
 	belongsTo: {
 		model: 'myapp.model.menu.Root',

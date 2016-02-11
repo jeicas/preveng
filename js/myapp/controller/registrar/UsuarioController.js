@@ -185,7 +185,7 @@ Ext.define('myapp.controller.registrar.UsuarioController', {
         var tipousuario=form.down("combobox[name=tipousuario]").getValue();
         var usuario=form.down("textfield[name=usuario]").getValue();
         var status=form.down("combobox[name=status]").getValue();
-      
+        
         me=this;
         if (form.getForm().isValid()) { 
                Ext.Ajax.request({ 
@@ -199,7 +199,8 @@ Ext.define('myapp.controller.registrar.UsuarioController', {
                         usuario:usuario,
                         status:status, 
                         correo:form.down("textfield[name=correo]").getValue(),
-                        nombre:form.down("textfield[name=nombre]").getValue()+" "+form.down("textfield[name=apellido]").getValue()
+                        nombre:form.down("textfield[name=nombre]").getValue()+" "+form.down("textfield[name=apellido]").getValue(),
+                        apellido:form.down("textfield[name=apellido]").getValue()
                          
                     },
                     success : function(form,action) {

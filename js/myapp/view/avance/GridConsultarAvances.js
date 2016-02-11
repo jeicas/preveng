@@ -162,7 +162,7 @@ Ext.define('myapp.view.consultar.GridConsultarAvances', {
                     }
                 }
             }, {
-                dataIndex: 'meta',
+                dataIndex: 'metalograda',
                 flex: 0.3,
                 text: 'Meta',
             }, {

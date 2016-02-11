@@ -1,13 +1,12 @@
-Ext.define('myapp.view.evento.WinComisionadoEvento', {
+Ext.define('myapp.view.actividad.WinAsignarResponsableAPlan', {
 extend: 'Ext.window.Window',
-  alias: 'widget.winComisionadoEvento',
-  itemId: 'winComisionadoEvento',
-  title:'Plan de Accion',
+  alias: 'widget.winAsignarResponsableAPlan',
+  itemId: 'winAsignarResponsableAPlan',
   height: 450,
   width: 490,
   modal:true,
   requires: [
-   'myapp.view.evento.ListaComisionadoEvento'
+   'myapp.view.actividad.ListaResponsablePlan'
   ],
   layout: {
    	type: 'fit'
@@ -20,7 +19,7 @@ extend: 'Ext.window.Window',
   },
   buildItem : function(){
     return [{
-      xtype: 'listaComisionadoEvento',
+      xtype: 'listaResponsablePlan',
     }]
   },
   buildDockedItems : function(){

@@ -1,7 +1,7 @@
-Ext.define('myapp.view.evento.ListaAsignarUsuario', {
+Ext.define('myapp.view.actividad.ListaAsignarResponsableActividad', {
     extend: 'Ext.grid.Panel',
-    alias: 'widget.listaAsignarUsuario',
-    itemId: 'listaAsignarUsuario',
+    alias: 'widget.listaAsignarResponsableActividad',
+    itemId: 'listaAsignarResponsableActividad',
     requires: [
         'Ext.selection.CellModel',
         'Ext.selection.CheckboxModel',
@@ -15,6 +15,7 @@ Ext.define('myapp.view.evento.ListaAsignarUsuario', {
     store: Ext.create('myapp.store.usuario.UsuarioStore'),
     emptyText: 'No hay comisionado asignado(s) a este Evento',
     columnLines: true,
+    //selType: 'checkboxmodel',
     initComponent: function () {
         var me = this;
         me.columns = me.buildColumns();
@@ -183,16 +184,12 @@ Ext.define('myapp.view.evento.ListaAsignarUsuario', {
                   items:[
                        {
                         xtype: 'button',
-                        name: 'btnGuardar',
+                        name: 'btnGuardarResponsableActividad',
                         text: 'Guardar',
                         iconCls: 'save'
                     }, 
                     
-                        {
-                        xtype: 'textfield',
-                        name: 'txtEvento',
-                       
-                    }      
+                             
                     
                 ]
             },

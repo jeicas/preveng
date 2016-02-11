@@ -16,7 +16,7 @@ class Menu_model extends CI_Model {
         $usuario = $username['usuario_id'];
         $pass = $username['password'];
         $queryString = $db_generica->query(
-                "Select p.menu menu, pr.nombre nombre, pr.apellido apellido, tipousuario.nombre as tipou
+                "Select p.menu menu, pr.nombre nombre, pr.apellido apellido, tipousuario.nombre as tipou, u.id as idusuario
       FROM usuario u 
       inner join persona pr on pr.cedula= u.cedula
       inner join tipousuario on u.tipousuario=tipousuario.id
@@ -39,7 +39,7 @@ class Menu_model extends CI_Model {
             $inN= $user['nombre'];
             $inA= $user['apellido'];
             $inTU= $user['tipou'];
-            
+            $inUID= $user['idusuario'];
             $queryString->free_result();
             $sql = $db_generica->query(" SELECT * FROM menu WHERE padre IS NULL  AND id in $in");
             if ($sql->num_rows() > 0) {
@@ -53,6 +53,7 @@ class Menu_model extends CI_Model {
                             $r['leaf'] = false;
                             $r['usuario']= strtoupper($inN)." ".strtoupper($inA);
                             $r['tipousuario']=strtoupper($inTU);
+                            $r['idusuario']=strtoupper($inUID);
                             $r['items'] = array();
                             foreach ($sqlquery->result_array() as $item) {
                                 $item['leaf'] = true;

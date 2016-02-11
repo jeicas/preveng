@@ -34,7 +34,7 @@ Ext.define('myapp.controller.Menu', {
             Ext.each(records, function (root) {
                 header.items.items[4].items.items[0].items.items[0].setText(records[0].get('usuario'));
                 header.items.items[4].items.items[0].items.items[1].setText(records[0].get('tipousuario'));
-
+                header.items.items[4].items.items[0].items.items[2].setValue(records[0].get('idusuario'));
                 var menu = Ext.create('myapp.view.menu.Item', {
                     title: root.get('text'),
                     iconCls: root.get('iconCls'),

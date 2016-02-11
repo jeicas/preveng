@@ -142,7 +142,7 @@ class Reincidencia extends CI_Controller {
         $fecha = date('Y-m-d');
         $estatus = 1;
         $resultFoto = false;
-
+        
         $data = array(
             'evento' => $idEv,
             'descripcion' => $descripcion,
@@ -224,9 +224,6 @@ class Reincidencia extends CI_Controller {
         $id = $this->post->input('id');
         $descripcion = $this->post->input('idEv');
         $costo = $this->post->input('idEv');
-
-
-
         $data = array(
             'id' => $id,
             'descripcion' => $descripcion,

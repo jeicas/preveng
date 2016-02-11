@@ -30,10 +30,8 @@ class Avance extends CI_Controller {
     }
     public function registrarAvance() {
        $user=$this->session->userdata('datasession');
-         $usuario = $user['idusuario'];
-
+       $usuario = $user['idusuario'];
         $actividad = $this->input->post('cmbActividad');
-    
         $tipo = $this->input->post('cmbTipoAvance');
         $costo = $this->input->post('txtCosto');
         $fecharegistro = date('Y-m-d');
@@ -45,7 +43,7 @@ class Avance extends CI_Controller {
         if ($resultadoAct->num_rows() > 0) {
             foreach ($resultadoAct->result_array() AS $row) {
                 if ($tipo == 0) { //tipo final
-                    $estatusAct = 3; // en Revision
+                     $estatusAct = 3; // en Revision
                      $estatus = 5;//pendiente por evaluar
                     if ($row['estatus'] == 1) { //actividad con estatus sin iniciar
                         $dataAvance = array(
@@ -155,7 +153,7 @@ class Avance extends CI_Controller {
                 $this->guardar_Imagen_Anexo($nombrefoto, $fotoType, $fotoTmp_name);
 
                 $dataAnexo = array(
-                    'avance' => $result,
+                    'avance' => $idAvance,
                     'direccion' => $nombrefoto,
                     'tipoarchivo' => substr($_FILES['txtArchivo']['name'], -3),
                     'estatus' => 1
@@ -164,7 +162,7 @@ class Avance extends CI_Controller {
             } else {
 
                 $dataAnexo = array(
-                    'avance' => $result,
+                    'avance' => $idAvance,
                     'direccion' => $this->input->post('txtDireccion'),
                     'tipoarchivo' => 'html',
                     'estatus' => 1
@@ -198,27 +196,27 @@ class Avance extends CI_Controller {
     
      public function asignarEmpleado() {
          $user=$this->session->userdata('datasession');
-        $actividad = $this->input->post('activ');
-        $usuario = $this->input->post('user');
+         $actividad = $this->input->post('activ');
         $fecha= date('Y-m-d');
         $estatus = 1;
-        $correo=$this->input->post('correo');
-        $nombre=$this->input->post('nombre');
         $evento=$this->input->post('evento');
         $titleactividad=$this->input->post('tactiv');
         $responsable=$user['nombre'];
       
-         $dataAvance = array('actividad' => $actividad,
-                            'usuario' => $usuario,
+        $arreglo= $_POST['records'];
+           if (isset($arreglo)) {
+            $records = json_decode($arreglo);
+            foreach ($records as $record1) {
+                 $dataAvance = array('actividad' => $actividad,
+                            'usuario' => $record1->id,
                             'fechaasignacion' => $fecha,
                             'estatus' => $estatus,
                         );
-            
-         $result = $this->avance_model->guardarAvance($dataAvance);
-
-        if ($result) {
-             $this->scriptcorreoprevengo->emailNuevoEjecutor($correo,$nombre,$responsable, $evento, $titleactividad);
-            
+                $result = $this->avance_model->guardarAvance($dataAvance);
+                $this->scriptcorreoprevengo->emailNuevoEjecutor($record1->correo,$record1->nombrecompleto,$responsable, $evento, $titleactividad);
+            }
+        }
+         if ($result) { 
             echo json_encode(array(
                 "success" => true,
                 "msg" => "Se Guardo con Éxito." 
@@ -287,9 +285,10 @@ class Avance extends CI_Controller {
     
     
     public function cargarGridAvance() {
+    $user=$this->session->userdata('datasession');
+                 
 
-
-        $avances = $this->avance_model->consultarListaAvance();
+        $avances = $this->avance_model->consultarListaAvance($user['idusuario']);
 
         if ($avances->num_rows() > 0) {
 
@@ -401,7 +400,9 @@ class Avance extends CI_Controller {
                     'descripcion' => $row['descripcion'],
                     'tipo' => $tipo,
                     'fecha' => $row['fecha'],
-                    'meta' => $row['meta'],
+                    'metalograda' => $row['meta'],
+                    'meta'=> $row['metaact'],
+                    'unidad'=> $row['unidad'],
                     'idUs' => $row['idUs'],
                     'evento' =>  $row['evento'],
                     'fechaAsignacion' => $row['fechaAsig'],

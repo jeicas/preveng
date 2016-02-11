@@ -21,6 +21,7 @@ Ext.define('myapp.view.avance.GridListaAvance', {
             startCollapsed : true
        }],
     store: Ext.create('myapp.store.avance.AvanceStore'),
+    selType:'checkboxmodel',
         viewConfig: {
         getRowClass: function (record, index) {
             var c = record.get('estatus');
@@ -53,9 +54,7 @@ Ext.define('myapp.view.avance.GridListaAvance', {
         me.callParent();
     },
     buildColumns: function () {
-        return [  {
-            xtype: 'rownumberer'
-        },
+        return [  
             {
                 dataIndex: 'actividad',
                 flex: 1.5,
@@ -189,7 +188,7 @@ Ext.define('myapp.view.avance.GridListaAvance', {
                 }
             }, 
               {
-                dataIndex: 'meta',
+                dataIndex: 'metalograda',
                 flex: 0.3,
                 text: 'Meta',
             },{

@@ -15,7 +15,7 @@ Ext.define('myapp.view.reportes.GraficoNivelEjecucion',
             axes: [{
                     type: 'Numeric',
                     position: 'left',
-                    fields: ['ejecutadas', 'porejecutar'],
+                    fields: ['porejecutar', 'ejecutadas'],
                     title: 'Nº de Actividades',
                     minimum: 0,
                     grid: true,

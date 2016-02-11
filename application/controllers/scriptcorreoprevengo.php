@@ -66,11 +66,46 @@ class Scriptcorreoprevengo extends CI_Controller {
         $this->correo->initialize($configGmail);
         $this->correo->from($from);
         $this->correo->to($correo);
-        $this->correo->subject('Asignación a un Evento');
+        $this->correo->subject('Asignación a un Plan de Acción');
 
         $html = "<h1>Asignacion</h1>
                 <p>Estimado(a): <b>$nombre</b></p>      
                 <p>Usted ha sido asignado como <b>RESPONSABLE del PLAN DE ACCION</b> del evento:$evento</p>
+                <p>Puede acceder al sistema con su cuenta y registrar las actividades correspondientes al plan de accion</p>
+              
+               <p>Este correo es enviado automáticamente por nuestro sistema, por favor, no responda, ni reenvíe mensajes a esta cuenta.</b></p>
+               <p><b>Sístema P.R.E.V.E.N.G.O.</b></p>
+                <p><b>Lara... Tierra Progresista</b></p>";
+        $this->correo->message($html);
+        $this->correo->send();
+    }
+    
+    
+       public function emailNuevoResponsableActividad($correo,$nombre, $evento, $actividad) {
+
+        $user = 'sistemaelectoralavanzadalara@gmail.com';
+        $pass = 'avanzadalara';
+        $from = 'P.R.E.V.E.N.G.O.';
+        
+        $this->load->library('email', '', 'correo');
+        $configGmail = array(
+            'protocol' => 'smtp',
+            'smtp_host' => 'ssl://smtp.gmail.com',
+            'smtp_port' => 465,
+            'smtp_user' => $user,
+            'smtp_pass' => $pass,
+            'mailtype' => 'html',
+            'charset' => 'utf-8',
+            'newline' => "\r\n"
+        );
+        $this->correo->initialize($configGmail);
+        $this->correo->from($from);
+        $this->correo->to($correo);
+        $this->correo->subject('Asignación a una Actividad');
+
+        $html = "<h1>Asignacion</h1>
+                <p>Estimado(a): <b>$nombre</b></p>      
+                <p>Usted ha sido asignado como <b>RESPONSABLE de la actividad:<b> $actividad </b>del PLAN DE ACCION del evento:$evento</p>
                 <p>Puede acceder al sistema con su cuenta para las actividades que se realizaran</p>
               
                <p>Este correo es enviado automáticamente por nuestro sistema, por favor, no responda, ni reenvíe mensajes a esta cuenta.</b></p>
@@ -101,7 +136,7 @@ class Scriptcorreoprevengo extends CI_Controller {
         $this->correo->initialize($configGmail);
         $this->correo->from($from);
         $this->correo->to($correo);
-        $this->correo->subject('Asignación a un Plan de Acción');
+        $this->correo->subject('Asignación a una Actividad');
 
         $html = "<h1>Asignacion</h1>
                 <p>Estimado(a): <b>$nombre</b></p>      

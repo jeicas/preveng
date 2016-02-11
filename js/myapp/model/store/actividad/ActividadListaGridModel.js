@@ -11,5 +11,6 @@ Ext.define('myapp.model.store.actividad.ActividadListaGridModel', {
         {name:  'actividad', type: 'STRING'},
         {name:  'estatus', type: 'STRING'},
         {name:  'eventoColor',type: 'STRING'},
+         {name:  'idencargado',type: 'STRING'},
     ] 
 });
