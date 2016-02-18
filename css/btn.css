@@ -89,6 +89,12 @@
 .evento{
   background-image:url('../imagen/btn/event.png') !important;
 }
+.evento2{
+  background-image:url('../imagen/btn/evento.png') !important;
+}
+.plan2{
+  background-image:url('../imagen/btn/listado.png') !important;
+}
 .seguridad{
   background-image:url('../imagen/btn/config.png') !important;
 }

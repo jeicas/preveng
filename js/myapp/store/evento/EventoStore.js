@@ -9,5 +9,15 @@ Ext.define('myapp.store.evento.EventoStore', {
             root: 'data'
         }
     },
+    root: {
+        text: 'Tree display of Countries',
+        id: 'myTree',
+        expanded: true
+    },
+    folderSort: true,
+    sorters: [{
+        property: 'text',
+        direction: 'ASC'
+    }],
     autoLoad: true
 });

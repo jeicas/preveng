@@ -48,6 +48,120 @@ class Evento_model extends CI_Model {
         return $query;
     }
 
+    
+    
+    public function cargarListaEventoPDF() {
+
+        $query = $this->db->query("Select evento.id as idEv, 
+                                    evento.titulo as titulo, 
+                                    evento.descripcion as descripcion, 
+                                    evento.fechatope as fechaEv,
+                                    evento.fechapreaviso as fechaPA,
+                                    evento.presupuesto as presupuesto,
+                                    evento.observacion as observacion,
+                                     CASE evento.estatus   WHEN 0 THEN 'COMPLETADO'
+                                  WHEN 1 THEN 'PENDIENTE'
+                                  WHEN 2 THEN 'EN EJECUCION'
+                                  WHEN 3 THEN 'CANCELADO'  
+                                  WHEN 4 THEN 'SIN PLAN' 
+                                  WHEN 5 THEN 'EXPIRADO' END as estatus,
+                                    alcance.nombre as alcance,
+                                    agente.nombre as agente,
+                                    tipoevento.nombre as tipoEv,
+                                    sector.nombre as sector,
+                                    bdgenerica.persona.nombre as nombre,
+                                    bdgenerica.persona.apellido as apellido
+                             from evento 
+                             inner join agente on agente.id=evento.agente
+                             inner join alcance on alcance.id=evento.alcance
+                             inner join tipoevento on tipoevento.id=evento.tipoevento
+                             inner join sector on sector.id=evento.sector
+                             left join actividad
+                                    on actividad.evento=evento.id
+                             left join actividad_usuario on actividad.id=actividad_usuario.actividad
+                             left join  bdgenerica.usuario 
+                                    on bdgenerica.usuario.id= actividad_usuario.usuario
+                             
+                             left join  bdgenerica.persona 
+                                    on bdgenerica.usuario.cedula=bdgenerica.persona.cedula
+                            left join bdgenerica.empleado on 
+                                         bdgenerica.persona.cedula=bdgenerica.empleado.cedula
+                            
+                             group by idEv
+                             order by fechaEv ASC");
+
+        return $query;
+    }
+     public function cargarListaEventoSeleccionPDF($condicion) {
+       /* $sql="Select evento.id as idEv, 
+                                    evento.titulo as titulo, 
+                                    evento.descripcion as descripcion, 
+                                    evento.fechatope as fechaEv,
+                                    evento.fechapreaviso as fechaPA,
+                                    evento.presupuesto as presupuesto,
+                                    evento.observacion as observacion,
+                                     CASE evento.estatus   WHEN 0 THEN 'COMPLETADO'
+                                  WHEN 1 THEN 'PENDIENTE'
+                                  WHEN 2 THEN 'EN EJECUCION'
+                                  WHEN 3 THEN 'CANCELADO'  
+                                  WHEN 4 THEN 'SIN PLAN' 
+                                  WHEN 5 THEN 'EXPIRADO' END as estatus,
+                                    alcance.nombre as alcance,
+                                    agente.nombre as agente,
+                                    tipoevento.nombre as tipoEv,
+                                    sector.nombre as sector,
+                                    bdgenerica.persona.nombre as nombre,
+                                    bdgenerica.persona.apellido as apellido
+                             from evento 
+                             inner join agente on agente.id=evento.agente
+                             inner join alcance on alcance.id=evento.alcance
+                             inner join tipoevento on tipoevento.id=evento.tipoevento
+                             inner join sector on sector.id=evento.sector
+                             left join actividad
+                                    on actividad.evento=evento.id
+                             left join actividad_usuario on actividad.id=actividad_usuario.actividad
+                             left join  bdgenerica.usuario 
+                                    on bdgenerica.usuario.id= actividad_usuario.usuario
+                             
+                             left join  bdgenerica.persona 
+                                    on bdgenerica.usuario.cedula=bdgenerica.persona.cedula
+                            left join bdgenerica.empleado on 
+                                         bdgenerica.persona.cedula=bdgenerica.empleado.cedula
+                            WHERE $condicion
+                             group by idEv
+                             order by fechaEv ASC";
+         print_r($sql);*/
+        $query = $this->db->query("Select evento.id as idEv, 
+                                    evento.titulo as titulo, 
+                                    evento.descripcion as descripcion, 
+                                    evento.fechatope as fechaEv,
+                                    evento.fechapreaviso as fechaPA,
+                                    evento.presupuesto as presupuesto,
+                                    evento.observacion as observacion,
+                                     CASE evento.estatus   WHEN 0 THEN 'COMPLETADO'
+                                  WHEN 1 THEN 'PENDIENTE'
+                                  WHEN 2 THEN 'EN EJECUCION'
+                                  WHEN 3 THEN 'CANCELADO'  
+                                  WHEN 4 THEN 'SIN PLAN' 
+                                  WHEN 5 THEN 'EXPIRADO' END as estatus,
+                                    alcance.nombre as alcance,
+                                    agente.nombre as agente,
+                                    tipoevento.nombre as tipoEv,
+                                    sector.nombre as sector
+                                  
+                             from evento 
+                             inner join agente on agente.id=evento.agente
+                             inner join alcance on alcance.id=evento.alcance
+                             inner join tipoevento on tipoevento.id=evento.tipoevento
+                             inner join sector on sector.id=evento.sector
+                            
+                            WHERE $condicion
+                             group by idEv
+                             order by fechaEv ASC");
+
+        return $query;
+    }
+    
      public function getDatosEvento($id) {
         $query = $this->db->query("SELECT *
                              from evento 

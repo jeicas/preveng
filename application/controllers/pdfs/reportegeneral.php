@@ -1,494 +1,6749 @@
 <?php
-if (!defined('BASEPATH'))exit('No direct script access allowed');
+
+if (!defined('BASEPATH'))
+    exit('No direct script access allowed');
+
 class Reportegeneral extends CI_Controller {
+
     function __construct() {
         parent::__construct();
-        $this->load->model('pdfs/ReporteGeneral_model');
-        $this->load->model('empleado/empleado_model');
+
         $this->load->helper('url');
         $this->load->database();
-        $this->nacionalidad='V';
-        $this->cedula=$this->input->post('cedula');
-        $this->load->library('Pdf'); 
-        $this->load->library(array('session'));         
+        $this->load->library('Pdf');
+        $this->load->model('evento/evento_model');
+        $this->load->library(array('session'));
+        // date_default_timezone_set('America/Caracas');
     }
+
+    public function generarReporteEventoGeneral() {
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+        $html .="<h1>Reporte General de Eventos</h1>";
+        $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente Emisor</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                    </tr>';
+        $reporte = $this->evento_model->cargarListaEventoPDF();
+        foreach ($reporte->result_array() as $fila2) {
+            $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                        </tr>';
+        }
+        $html .='<tr>
+                         <td colspan="16"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+
+
+
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTodos() {
+        $alcance = $this->input->get('alcance');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+        $tipo = $this->input->get('tipoEvento');
+        $agente = $this->input->get('agente');
+        $estatus = $this->input->get('estatus');
+        $sector = $this->input->get('sector');
+
+        $nalcance = $this->input->get('nalcance');
+        $ntipo = $this->input->get('ntipoEvento');
+        $nagente = $this->input->get('nagente');
+        $nestatus = $this->input->get('nestatus');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                            
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($fecha)) . '</b></p></td> 
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.agente=' . $agente . ' and evento.fechatope="' . $fecha . '" and evento.tipoevento=' . $tipo . ' and evento.sector=' . $sector . ' and evento.estatus=' . $estatus;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="14"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+//================= Reportes con Tipo de Evento Seleccionado=====================================================================================
+    public function generarReporteEventoGeneralSeleccionTipoEvento() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.tipoevento=' . $tipo;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente Emisor</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="19"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con el tipo de evento seleccionado.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoSector() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.tipoevento=' . $tipo;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente Emisor</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoFecha() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("d-m-Y", strtotime($fecha)) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.fechatope="' . $fecha . '" and evento.tipoevento=' . $tipo;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                       <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente Emisor</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>                                
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="14"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAgente() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.agente=' . $agente . ' and evento.tipoevento=' . $tipo;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAlcance() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.tipoevento=' . $tipo;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente Emisor</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoEstatus() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.tipoevento=' . $tipo;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente Emisor</b></p></td>
+                       <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoSectorAgente() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.tipoevento=' . $tipo . ' and evento.agente=' . $agente;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="15"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAgenteAlcance() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.tipoevento=' . $tipo . ' and evento.agente=' . $agente;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sectpr</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="15"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAgenteEstatus() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.tipoevento=' . $tipo . ' and evento.agente=' . $agente;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="15"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAgenteFecha() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.fechatope="' . $fecha . '" and evento.tipoevento=' . $tipo . ' and evento.agente=' . $agente;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAlcanceSector() {
+
+        $tipo = $this->input->get('tipoevento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b>  Sector</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.tipoevento=' . $tipo . ' and evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="15"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAlcanceEstatus() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b>  Estatus </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.tipoevento=' . $tipo . ' and evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="15"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAlcanceFecha() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b>  Fecha</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.fechatope="' . $fecha . '" and evento.tipoevento=' . $tipo . ' and evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                         <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                                  <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="15"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoEstatusFecha() {
+
+        $tipoE = $this->input->get('tipoevento');
+        $estatus = $this->input->get('estatus');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $ntipoE = $this->input->get('ntipoEvento');
+        $nestatus = $this->input->get('nestatus');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipoE . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.tipoevento=' . $tipoE . ' and evento.fechatope="' . $fecha . '"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="29"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoSectorFecha() {
+
+        $tipoE = $this->input->get('tipoevento');
+        $sector = $this->input->get('sector');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $ntipoE = $this->input->get('ntipoEvento');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipoE . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.tipoevento=' . $tipoE . ' and evento.fechatope="' . $fecha . '"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="29"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoSectorEstatus() {
+
+        $tipoE = $this->input->get('tipoevento');
+        $estatus = $this->input->get('estatus');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $ntipoE = $this->input->get('ntipoEvento');
+        $nestatus = $this->input->get('nestatus');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipoE . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.tipoevento=' . $tipoE . ' and evento.sector=' . $sector;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                         
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['alcance'] . '</p></td>
+                           
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="24"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoSectorAgenteAlcance() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance  </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.tipoevento=' . $tipo . ' and evento.agente=' . $agente . ' and evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                      
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                           
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="13"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAgenteAlcanceEstatus() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance  </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.tipoevento=' . $tipo . ' and evento.agente=' . $agente . ' and evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                      
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                           
+                            <td colspan="2.5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="13"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAgenteAlcanceFecha() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance  </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $fecha . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.fechatope="' . $fecha . '" and evento.tipoevento=' . $tipo . ' and evento.agente=' . $agente . ' and evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                         <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="15"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAlcanceSectorFecha() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $fecha . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.fechatope="' . $fecha . '" and evento.tipoevento=' . $tipo . ' and evento.sector=' . $sector . ' and evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                         <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="13"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionTipoEventoAlcanceSectorEstatus() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.tipoevento=' . $tipo . ' and evento.sector=' . $sector . ' and evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['agente'] . '</p></td>
+                           
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="13"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+     public function generarReporteEventoGeneralSeleccionTipoEventoSectorEstatusFecha() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $fecha . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.fechatope="' . $fecha . '" and evento.tipoevento=' . $tipo . ' and evento.sector=' . $sector . ' and evento.estatus=' . $estatus;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                         <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="15"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+    
+    
    
-    public function generarPermiso(){
-        if($this->input->get("fechades")=='' || $this->input->get("fechahas")==''){
-            $desde=date('Y-m-d');
-            $hasta=date('Y-m-d');
-        }else{
-            $desde=$this->input->get("fechades");
-            $hasta=$this->input->get("fechahas");
-        }
-        $departamento=($this->input->get("departamento")!='null')?'='.$this->input->get("departamento"):'LIKE "%"';        
-        $motivoautorizacion= ($this->input->get("motivoautorizacion")!='null')?'='.$this->input->get("motivoautorizacion"):'LIKE "%"';
-        $tipoautorizacion=($this->input->get("tipoautorizacion")!='null')?'='.$this->input->get("tipoautorizacion"):'LIKE "%"';
-        $pdf = new Pdf('l', 'mm', 'A4', true, 'UTF-8', false);
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetSubject('Tutorial TCPDF');
-        $pdf->SetKeywords('TCPDF, PDF, example, test, guide');
-        $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH1, PDF_HEADER_TITLE, PDF_HEADER_STRING);
-        $pdf->setFooterData($tc = array(0, 64, 0), $lc = array(0, 64, 128));
-        // datos por defecto de cabecera, se pueden modificar en el archivo tcpdf_config.php de libraries/config       
-        $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-        $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-        $pdf->SetPageOrientation('p');
-        // se pueden modificar en el archivo tcpdf_config.php de libraries/config
+    public function generarReporteEventoGeneralSeleccionTipoEventoSectorAgenteAlcanceEstatus() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
         $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-        // se pueden modificar en el archivo tcpdf_config.php de libraries/config
-        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        // se pueden modificar en el archivo tcpdf_config.php de libraries/config
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
         $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-        //relación utilizada para ajustar la conversión de los píxeles
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
         $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-        // establecer el modo de fuente por defecto
-        $pdf->setFontSubsetting(true); 
-        $pdf->SetFont('times', '', 9, '', true);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
         $pdf->AddPage();
-        $html=null;
-        $nombre_archivo=null;
-        $username = $this->session->userdata('datasession');
-        if ($username['idusuario']==13){
-            $resultado2 = $this->ReporteGeneral_model->getpermisos($motivoautorizacion,$tipoautorizacion,$desde,$hasta,$departamento);
-            $depa=$this->empleado_model->ReporteGeneral_model->getdptodos($departamento,$desde,$hasta);
-        }else{
-            $resultado2 = $this->ReporteGeneral_model->getpermisodos($motivoautorizacion,$tipoautorizacion,$username['idusuario'],$desde,$hasta);
-            $depa=$this->empleado_model->buscarDepartamentoUsuario($username['cedula'],$username['nacionalidad']);
-        }
-        //echo json_encode($resultado2);
-        if($resultado2->num_rows() > 0){
-            foreach($depa->result_array() as $fila2){
-                if ($username['idusuario']==13){
-                    $resultado = $this->ReporteGeneral_model->getpermiso($motivoautorizacion,$tipoautorizacion,$desde,$hasta,$fila2['departamento']);
-                }else{
-                    $resultado = $resultado2;
-                }
-                $pdf->SetFont('Times','B',14);
-                $pdf->Text(14, 25, 'Departamento: '.$fila2['nombre']);
-                $pdf->SetFont('Times','B',12);
-                $pdf->Text(50, 35, 'Listado de autorización(es) de empleado(s) con permiso.');                
-                $pdf->Ln(20);
-                $pdf->Text(70, 40, 'Para la fecha: '.$desde.' al '.$hasta);
-                $pdf->Ln(15);
-                $pdf->SetFont('times', '', 11, '', true);
-                $pdf->SetFillColor('150','210','255');
-                $pdf->Cell(20, 0, 'Cédula', 1, 0, 'C',1);
-                $pdf->Cell(50, 0, 'Nombres y Apellidos', 1, 0, 'C',1);
-                $pdf->Cell(32, 0, 'Fecha autorización', 1, 0, 'C',1);
-                $pdf->Cell(42, 0, 'Motivo de la autorización', 1, 0, 'C',1);
-                $pdf->Cell(45, 0, 'Tipo de autorización', 1, 1, 'C',1);
-                $cedemp='null';
-                $permiso=array();
-                $tot=0;
-                foreach($resultado->result_array() as $fila){
-                    $tot=$tot+1;                   
-                    if ($cedemp!=$fila['cedula']){
-                        if ($cedemp!='null'){
-                            $l=1;
-                            $e=0;
-                            $r = count($permiso);
-                            if($r>3){
-                                $pdf->Cell(32, 0,$permiso[0], 1, 0, 'C', 0, '', 0);
-                                while ($l<$r-1){
-                                    if($e!=$l){
-                                        $pdf->Cell(42, 0,$permiso[$l], 1, 0, 'C', 0, '', 0);
-                                        $pdf->Cell(45, 0,$permiso[$l+1], 1, 1, 'C', 0, '', 0);
-                                    }else{
-                                        $l=$l+2;
-                                        if($l<$r){
-                                            $pdf->SetX(85);                                           
-                                            $pdf->Cell(32, 0,$permiso[$l-1], 1, 0, 'C', 0, '', 0);
-                                            $pdf->Cell(42, 0,$permiso[$l], 1, 0, 'C', 0, '', 0);
-                                            $pdf->Cell(45, 0,$permiso[$l+1], 1, 1, 'C', 0, '', 0);
-                                        }
-                                    }
-                                    $l=$l+1;
-                                    $e=$l;
-                                }
-                            }else{
-                                $pdf->Cell(32, 0,$permiso[0], 1, 0, 'C', 0, '', 0);
-                                $pdf->Cell(42, 0,$permiso[1], 1, 0, 'C', 0, '', 0);
-                                $pdf->Cell(45, 0,$permiso[2], 1, 1, 'C', 0, '', 0);
-                            }
-                            unset($permiso);
-                            $permiso=array();
-                            $pdf->Cell(20, 0, $fila['cedula'], 1, 0, 'C', 0, '', 1);
-                            $pdf->Cell(50, 0, $fila['nombre'].' '.$fila['apellido'], 1, 0, 'C', 0, '', 1);
-                            $fecha=$fila["fechaautorizacion"];
-                            $motivo=$fila["motivoautorizacion"];                            
-                            $tipo=$fila["tipoautorizacion"];
-                            array_push($permiso,$fecha,$motivo,$tipo);
-                            $cedemp=$fila['cedula'];
-                        }else{
-                            if ($tot==1){
-                                $pdf->Cell(20, 0, $fila['cedula'], 1, 0, 'C', 0, '', 1);
-                                $pdf->Cell(50, 0, $fila['nombre'].' '.$fila['apellido'], 1, 0, 'C', 0, '', 1);                                
-                                $fecha=$fila["fechaautorizacion"];
-                                $motivo=$fila["motivoautorizacion"];
-                                $tipo=$fila["tipoautorizacion"];
-                                array_push($permiso,$fecha,$motivo,$tipo);
-                                $cedemp=$fila['cedula'];
-                            }
-                        }
-                    }else{
-                        $fecha=$fila["fechaautorizacion"];
-                        $motivo=$fila["motivoautorizacion"];                        
-                        $tipo=$fila["tipoautorizacion"];
-                        array_push($permiso,$fecha,$motivo,$tipo);
-                    }
-                }
-                $l=1;
-                $e=0;
-                $r = count($permiso);
-                if($r>3){
-                    $pdf->Cell(32, 0,$permiso[0], 1, 0, 'C', 0, '', 0);
-                    while ($l<$r-1){
-                        if($e!=$l){
-                            $pdf->Cell(42, 0,$permiso[$l], 1, 0, 'C', 0, '', 0);
-                            $pdf->Cell(45, 0,$permiso[$l+1], 1, 1, 'C', 0, '', 0);
-                        }else{
-                            $l=$l+2;
-                            if($l<$r){
-                                $pdf->SetX(85);                                           
-                                $pdf->Cell(32, 0,$permiso[$l-1], 1, 0, 'C', 0, '', 0);
-                                $pdf->Cell(42, 0,$permiso[$l], 1, 0, 'C', 0, '', 0);
-                                $pdf->Cell(45, 0,$permiso[$l+1], 1, 1, 'C', 0, '', 0);
-                            }
-                        }
-                        $l=$l+1;
-                        $e=$l;
-                    }
-                }else{                                                        
-                    $pdf->Cell(32, 0,$permiso[0], 1, 0, 'C', 0, '', 0);
-                    $pdf->Cell(42, 0,$permiso[1], 1, 0, 'C', 0, '', 0);
-                    $pdf->Cell(45, 0,$permiso[2], 1, 1, 'C', 0, '', 0);
-                }                
-                $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.tipoevento=' . $tipo . ' and evento.agente=' . $agente . ' and evento.alcance=' . $alcance . ' and evento.estatus=' . $estatus;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                      
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                           
+                            
+                        </tr>';
             }
-        }else{            
-            $pdf->SetFont('Times','B',18);
-            $pdf->Text(50, 25, 'Para la fecha: '.$desde.' al '.$hasta);
-            $pdf->Ln(15);
-            $pdf->Text(14, 40, 'No se encuentran autorización(es) con las características indicadas.');            
-        }   
-        $pdf->Output('resumengeneral.pdf', 'I');
+            $html .='<tr>
+                         <td colspan="11"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
     }
-    public function generarListadoGneral() {
-        $departamento=($this->input->get("departamento")!='null')?'='.$this->input->get("departamento"):'LIKE "%"';       
-        $pdf = new Pdf('l', 'mm', 'A4', true, 'UTF-8', false);
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetSubject('Tutorial TCPDF');
-        $pdf->SetKeywords('TCPDF, PDF, example, test, guide');
-         $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH1, PDF_HEADER_TITLE, PDF_HEADER_STRING);
-        $pdf->setFooterData($tc = array(0, 64, 0), $lc = array(0, 64, 128));
-        // datos por defecto de cabecera, se pueden modificar en el archivo tcpdf_config.php de libraries/config
-        $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-        $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-        $pdf->SetPageOrientation('p');
-        // se pueden modificar en el archivo tcpdf_config.php de libraries/config
+
+     public function generarReporteEventoGeneralSeleccionTipoEventoAgenteAlcanceSectorFecha() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
         $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-        // se pueden modificar en el archivo tcpdf_config.php de libraries/config
-        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        // se pueden modificar en el archivo tcpdf_config.php de libraries/config
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
         $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-        //relación utilizada para ajustar la conversión de los píxeles
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
         $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-        // establecer el modo de fuente por defecto
-        $pdf->setFontSubsetting(true); 
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
         $pdf->AddPage();
-        $html=null;
-        $nombre_archivo=null;
-        $username = $this->session->userdata('datasession');
-        if ($username['idusuario']==13){
-            $resultado2 = $this->ReporteGeneral_model->getlistadogeneraldosdos($departamento);
-            $depa=$this->ReporteGeneral_model->getdpto($departamento);
-        }
-        if ($username['idusuario']==18){
-            $depaafinanzas=$this->empleado_model->buscarDepartamentoUsuario($username['cedula'],$username['nacionalidad']);
-            foreach ($depaafinanzas->result_array() as $row){
-                $dat[] = array( 
-                    'depa'=> $row['departamento']
-                );
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.tipoevento=' . $tipo . ' and evento.agente=' . $agente . ' and evento.alcance=' . $alcance . ' and evento.fechatope="' . $fecha.'"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="3"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
             }
-            $departamento2=$row['departamento'];
-            $arredepar18=array(4,5,11,14,15,16,17,18,19,20,21,22,23,28,29,30);
-            if($departamento!='LIKE "%"'){
-                if(in_array($this->input->get("departamento"),$arredepar18)){
-                    $depa=$this->ReporteGeneral_model->getdptotres($departamento);
-                }else{                    
-                    $depa=$this->ReporteGeneral_model->getdptotresdos($departamento2);
-                }                
-            }else{                    
-                $depa=$this->ReporteGeneral_model->getdptotresdos($departamento2);
-            }
-           $resultado2 = $this->ReporteGeneral_model->getlistadogeneraldosdos($departamento);
+            $html .='<tr>
+                         <td colspan="13"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="3"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
         }
-        if($username['idusuario']!=13 && $username['idusuario']!=18){
-            $resultado2 = $this->ReporteGeneral_model->getlistadogenerall($username['idusuario']);            
-            $depa=$this->empleado_model->buscarDepartamentoUsuario($username['cedula'],$username['nacionalidad']);
-        }
-        if($resultado2->num_rows() > 0){
-            foreach ($depa->result_array() as $row){   
-                if ($username['idusuario']==13){
-                    $resultado = $this->ReporteGeneral_model->getlistadogeneraldos($row['departamento']);
-                }if ($username['idusuario']==18){
-                    $resultado4= $this->ReporteGeneral_model->gettotalempeladosafinanzas($row['departamento']);
-                    $resultado3= $this->ReporteGeneral_model->gettotalPermisosafinanzas($row['departamento']);
-                    $resultado = $this->ReporteGeneral_model->getlistadogeneraldos($row['departamento']);
-                }
-                if($username['idusuario']!=13 && $username['idusuario']!=18){
-                    $resultado = $this->ReporteGeneral_model->getlistadogenerall($username['idusuario']);
-                }         
-                // $pdf->SetXY(10, 05);
-                // $pdf->Image('imagen/logo/Logo-Nuevo-Gober-sin-borde.png', '', '', 60, 0, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
-                // $pdf->SetXY(170, 10);
-                // $pdf->Image('imagen/logo/LARA-PROGRESISTA-CON-BORDE.png', '', '', 22, 0, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
-                $pdf->Ln(20);
-                $pdf->SetFont('Times','B',16);
-                $pdf->SetXY('15', 40);
-                $pdf->Text(14, 35, 'Departamento: '.$row['nombre']);
-                $pdf->SetFont('times', '', 12, '', true);
-                $pdf->SetFillColor('150','210','255');
-                $pdf->SetXY(15, 50);
-                $pdf->MultiCell(35, 10, 'Oficina', 1, 0, 'C',0);
-                $pdf->MultiCell(20, 10, 'Personal', 1, 0, 'C',0);
-                $pdf->MultiCell(20, 10, 'Laboral', 1, 0, 'C',0);
-                $pdf->MultiCell(20, 10, 'Medico', 1, 0, 'C',0);
-                $pdf->MultiCell(20, 10, 'Estudio', 1, 0, 'C',0);
-                $pdf->MultiCell(20, 10, 'Sindical', 1, 0, 'C',0);
-                $pdf->MultiCell(20, 10, 'Total', 1, 0, 'R',0);
-                $pdf->MultiCell(30, 10, 'Nro. Empleados', 1, 1, 'C',1);
-                $idoficina='null';
-                $motivo=array();
-                $tot=0;
-                foreach($resultado->result_array() as $fila){
-                    $tot=$tot+1;
-                    if ($idoficina!=$fila['id']){
-                        if ($idoficina!=null){
-                            $result=0;
-                            foreach($motivo as $re){
-                                if($re!=0){
-                                    $result=$result+$re;
-                                }      
-                                $pdf->Cell(20, 25,$re, 1, 0, 'C', 0, '', 0);// VALORES DEL ULTIMO
-                            }
-                            unset($motivo);
-                            $motivo=array();
-                            $pdf->MultiCell(35, 25, $row['nombre'], 1, 0, 'C', 0);
-                            $mot1=$fila["Personal"];
-                            $mot2=$fila["Laboral"];
-                            $mot3=$fila["Medico"];
-                            $mot4=$fila["Estudio"];
-                            $mot5=$fila["Sindical"];
-                            array_push($motivo,$mot1,$mot2,$mot3,$mot4,$mot5);
-                            $idoficina=$fila['id'];
-                        }else{
-                            if ($tot==1){
-                                $pdf->SetFillColor('190');
-                                $pdf->MultiCell(35, 25, $row['nombre'], 1, 0, 'C', 0);
-                                $mot1=$fila["Personal"];
-                                $mot2=$fila["Laboral"];
-                                $mot3=$fila["Medico"];
-                                $mot4=$fila["Estudio"];
-                                $mot5=$fila["Sindical"];
-                                array_push($motivo,$mot1,$mot2,$mot3,$mot4,$mot5);
-                                $idoficina=$fila['id'];
-                            }
-                        }
-                    }else{
-                        if ($motivo[0] ==0 && $fila["Personal"]!='0') {
-                            $reemplazo = array(0 => $fila["Personal"]);
-                            $motivo = array_replace($motivo, $reemplazo);
-                        }
-                        if ($motivo[1] ==0 && $fila["Laboral"]!='0') {
-                            $reemplazo = array(1 => $fila["Laboral"]);
-                            $motivo = array_replace($motivo, $reemplazo);
-                        }
-                        if ($motivo[2] ==0 && $fila["Medico"]!='0') {
-                            $reemplazo = array(2 => $fila["Medico"]);
-                            $motivo = array_replace($motivo, $reemplazo);
-                        }
-                        if ($motivo[3] ==0 && $fila["Estudio"]!='0'){
-                            $reemplazo = array(3 => $fila["Estudio"]);
-                            $motivo = array_replace($motivo, $reemplazo);
-                        }
-                        if ($motivo[4] ==0 && $fila["Sindical"]!='0'){
-                            $reemplazo = array(4 => $fila["Sindical"]);
-                            $motivo = array_replace($motivo, $reemplazo);
-                        }
-                    }
-                }
-                $result2=0;
-                foreach($motivo as $re){
-                    if($re!=0){
-                        $result2=$result2+$re;
-                    }      
-                    $pdf->Cell(20, 25,$re, 1, 0, 'C', 0, '', 0);// VALORES DEL ULTIMO
-                }
-                $pdf->Cell(20, 25,$result2 , 1, 0, 'C', 1);
-                if($username['idusuario']==18){
-                     $resultado4= $this->ReporteGeneral_model->gettotalempeladosafinanzas($row['departamento']);
-                     $resultado3= $this->ReporteGeneral_model->gettotalPermisosafinanzas($row['departamento']);
-                }else{
-                     $resultado4= $this->ReporteGeneral_model->gettotalempelados($row['departamento']);
-                     $resultado3= $this->ReporteGeneral_model->gettotalPermisos($row['departamento']);
-                }
-                foreach($resultado4->result_array() as $fila2){ 
-                    if ($fila2['departamento']==$row['departamento']){  
-                        $pdf->Cell(30, 25,$fila2["total"], 1, 1, 'C', 1);
-                    }
-                }
-                $pdf->AddPage();
-            }
-        }else{            
-            $pdf->SetFont('Times','B',18);
-            $pdf->Text(14, 12, 'No se encuentran autorización(es) con las características indicadas.');
-        }              
-        $pdf->Output('resumengeneral.pdf', 'I');
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
     }
-//------------------------------------------RESUMEN DE AUTORIZACIONES POR EMPLEADO------------------------------
-    public function generarSalidaEmpleados() {
-        $departamento=($this->input->get("departamento")!='null')?'='.$this->input->get("departamento"):'LIKE "%"';
-        $nacionalidad=($this->input->get("nacionalidad")!='') ?  "LIKE '%".$this->input->get("nacionalidad")."%'":'LIKE "%"';
-        $cedula=($this->input->get("cedula" )!='') ?'='.$this->input->get("cedula"):'LIKE "%"';
-        $nombre=($this->input->get("nombre" )!='') ?  "LIKE '%".$this->input->get("nombre")."%'":'LIKE "%"';
-        $apellido=($this->input->get("apellido" )!='') ?  "LIKE '%".$this->input->get("apellido")."%'":'LIKE "%"';
-        $pdf = new Pdf('l', 'mm', 'A4', true, 'UTF-8', false);
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetSubject('Tutorial TCPDF');
-        $pdf->SetKeywords('TCPDF, PDF, example, test, guide');
-         $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH1, PDF_HEADER_TITLE, PDF_HEADER_STRING);
-        $pdf->setFooterData($tc = array(0, 64, 0), $lc = array(0, 64, 128));
-        // datos por defecto de cabecera, se pueden modificar en el archivo tcpdf_config.php de libraries/config
-        // $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH,'Listado General',PDF_HEADER_STRING,array(0,64,255), array(0,64,128));
-        $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-        $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-        $pdf->SetPageOrientation('p');
-        // se pueden modificar en el archivo tcpdf_config.php de libraries/config
+
+    
+    
+    public function generarReporteEventoGeneralSeleccionTipoEventoAgenteAlcanceEstatusFecha() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
         $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-        // se pueden modificar en el archivo tcpdf_config.php de libraries/config
-        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        // se pueden modificar en el archivo tcpdf_config.php de libraries/config
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
         $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-        //relación utilizada para ajustar la conversión de los píxeles
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
         $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-        // establecer el modo de fuente por defecto
-        $pdf->setFontSubsetting(true);         
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
         $pdf->AddPage();
-        $html=null;
-        $nombre_archivo=null;
-        $username = $this->session->userdata('datasession');
-        if ($username['idusuario']==13){            
-            $resultado2 = $this->ReporteGeneral_model->getdptoempleadosdos($nacionalidad,$cedula,$nombre,$apellido,$departamento);
-        }else{
-            $resultado2 = $this->ReporteGeneral_model->getdptoempleados($nacionalidad,$cedula,$nombre,$apellido,$username['idusuario']);
-            $resultado = $this->ReporteGeneral_model->getsalidasempleados($nacionalidad,$cedula,$nombre,$apellido,$username['idusuario']);
-        }        
-        if($resultado2->num_rows() > 0){
-            foreach($resultado2->result_array() as $fila2){
-                if ($username['idusuario']==13){
-                    $resultado = $this->ReporteGeneral_model->getsalidasempleadosdos($nacionalidad,$cedula,$nombre,$apellido,$fila2['departamento']);
-                }else{
-                    $resultado = $this->ReporteGeneral_model->getsalidasempleados($nacionalidad,$cedula,$nombre,$apellido,$username['idusuario']);
-                }
-                $pdf->SetFont('Times','B',14);
-                $pdf->Text(14, 25, 'Departamento: '.$fila2['nombre']);
-                $pdf->SetFont('Times','B',12);
-                $pdf->Text(50, 35, 'Resumen de autorización(es) por empleado(s).');                
-                $pdf->Ln(15);
-                $pdf->SetFont('times', '', 11, '', true);
-                $pdf->SetFillColor('150','210','255');
-                $pdf->Cell(20, 0, 'Cédula', 1, 0, 'C',1);
-                $pdf->Cell(60, 0, 'Nombres y Apellidos', 1, 0, 'C',1);
-                $pdf->Cell(20, 0, 'Personal', 1, 0, 'C',1);
-                $pdf->Cell(20, 0, 'Laboral', 1, 0, 'C',1);
-                $pdf->Cell(20, 0, 'Medico', 1, 0, 'C',1);
-                $pdf->Cell(20, 0, 'Estudio', 1, 0, 'C',1);
-                $pdf->Cell(20, 0, 'Sindical', 1, 0, 'C',1);
-                $pdf->Cell(10, 0, 'Total', 1, 1, 'C',1);
-                $cedemp='null';
-                $motivo=array();
-                $tot=0;
-                foreach($resultado->result_array() as $fila){
-                    $tot=$tot+1;                   
-                    if ($cedemp!=$fila['cedula']){
-                        if ($cedemp!='null'){
-                            $result=0;
-                            foreach($motivo as $re){
-                                if($re!=0){
-                                    $result=$result+$re;
-                                }                                                        
-                                $pdf->Cell(20, 0,$re, 1, 0, 'C', 0, '', 0);
-                            }
-                            $pdf->Cell(10, 5,$result , 1, 1, 'C', 1);                        
-                            unset($motivo);
-                            $motivo=array();
-                            $pdf->Cell(20, 0, $fila['cedula'], 1, 0, 'C', 0, '', 1);
-                            $pdf->Cell(60, 0, $fila['nombre'].' '.$fila['apellido'], 1, 0, 'C', 0, '', 1);
-                            $mot1=$fila["Personal"];
-                            $mot2=$fila["Laboral"];
-                            $mot3=$fila["Medico"];
-                            $mot4=$fila["Estudio"];
-                            $mot5=$fila["Sindical"];
-                            array_push($motivo,$mot1,$mot2,$mot3,$mot4,$mot5);
-                            $cedemp=$fila['cedula'];
-                        }else{
-                            if ($tot==1){
-                                $pdf->Cell(20, 0, $fila['cedula'], 1, 0, 'C', 0, '', 1);
-                                $pdf->Cell(60, 0, $fila['nombre'].' '.$fila['apellido'], 1, 0, 'C', 0, '', 1);
-                                $mot1=$fila["Personal"];
-                                $mot2=$fila["Laboral"];
-                                $mot3=$fila["Medico"];
-                                $mot4=$fila["Estudio"];
-                                $mot5=$fila["Sindical"];
-                                array_push($motivo,$mot1,$mot2,$mot3,$mot4,$mot5);
-                                $cedemp=$fila['cedula'];
-                            }
-                        }
-                    }else{                                       
-                        if ($motivo[0] ==0 && $fila["Personal"]!='0') {                        
-                            $reemplazo = array(0 => $fila["Personal"]);
-                            $motivo = array_replace($motivo, $reemplazo);
-                        }                             
-                        if ($motivo[1] ==0 && $fila["Laboral"]!='0') {
-                            $reemplazo = array(1 => $fila["Laboral"]);
-                            $motivo = array_replace($motivo, $reemplazo);
-                        }
-                        if ($motivo[2] ==0 && $fila["Medico"]!='0') {
-                            $reemplazo = array(2 => $fila["Medico"]);
-                            $motivo = array_replace($motivo, $reemplazo);
-                        }
-                        if ($motivo[3] ==0 && $fila["Estudio"]!='0'){
-                            $reemplazo = array(3 => $fila["Estudio"]);
-                            $motivo = array_replace($motivo, $reemplazo);
-                        }
-                        if ($motivo[4] ==0 && $fila["Sindical"]!='0'){
-                            $reemplazo = array(4 => $fila["Sindical"]);
-                            $motivo = array_replace($motivo, $reemplazo);
-                        }
-                    }
-                }
-                $result2=0;
-                foreach($motivo as $re){
-                    if($re!=0){
-                        $result2=$result2+$re;
-                    }      
-                    $pdf->Cell(20, 0,$re, 1, 0, 'C', 0, '', 0);
-                }
-                $pdf->Cell(10, 5,$result2 , 1, 1, 'C', 1);
-                $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                        
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.tipoevento=' . $tipo . ' and evento.agente=' . $agente . ' and evento.alcance=' . $alcance . ' and evento.fechatope="' . $fecha.'"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="3"><p align="center">' . $fila2['sector'] . '</p></td>
+                            
+                        </tr>';
             }
-        }else{            
-            $pdf->SetFont('Times','B',18);
-            $pdf->Text(14, 25, 'No se encuentran autorización(es) con las características indicadas.');
-        }   
-        $pdf->Output('resumengeneral.pdf', 'I');
+            $html .='<tr>
+                         <td colspan="13"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="3"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
     }
+
+    
+    public function generarReporteEventoGeneralSeleccionTipoEventoAgenteSectorEstatusFecha() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.tipoevento=' . $tipo . ' and evento.agente=' . $agente . ' and evento.estatus=' . $estatus . ' and evento.fechatope="' . $fecha.'"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="3"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="13"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="3"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    
+    public function generarReporteEventoGeneralSeleccionTipoEventoAlcanceSectorEstatusFecha() {
+
+        $tipo = $this->input->get('tipoEvento');
+        $ntipo = $this->input->get('ntipoEvento');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Tipo de Evento </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $ntipo . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.tipoevento=' . $tipo . ' and evento.estatus=' . $estatus . ' and evento.alcance=' . $alcance . ' and evento.fechatope="' . $fecha.'"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="3"><p align="center">' . $fila2['agente'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="13"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="3"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    //====================================Reportes con Agente Seleccionado===========================================================================================
+
+    public function generarReporteEventoGeneralSeleccionAgente() {
+
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente Emisor </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.agente=' . $agente;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                         <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="19"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con el agente seleccionado.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteAlcance() {
+
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.agente=' . $agente;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteFecha() {
+
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("d-m-Y", strtotime($fecha)) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.fechatope="' . $fecha . '" and evento.agente=' . $agente;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                                <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="19"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteSector() {
+
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.agente=' . $agente;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteEstatus() {
+
+        $agente = $this->input->get('agente');
+        $nagente = $this->input->get('nagente');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Agente </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.agente=' . $agente;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                       <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteAlcanceSectorEstatusFecha() {
+        $alcance = $this->input->get('alcance');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+        $agente = $this->input->get('agente');
+        $estatus = $this->input->get('estatus');
+        $sector = $this->input->get('sector');
+
+        $nalcance = $this->input->get('nalcance');
+        $nagente = $this->input->get('nagente');
+        $nestatus = $this->input->get('nestatus');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($fecha)) . '</b></p></td> 
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.agente=' . $agente . ' and evento.fechatope="' . $fecha . '" and evento.sector=' . $sector . ' and evento.estatus=' . $estatus;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                             <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="19"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteAlcanceSectorEstatus() {
+        $alcance = $this->input->get('alcance');
+        $agente = $this->input->get('agente');
+        $estatus = $this->input->get('estatus');
+        $sector = $this->input->get('sector');
+
+        $nalcance = $this->input->get('nalcance');
+        $nagente = $this->input->get('nagente');
+        $nestatus = $this->input->get('nestatus');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>
+                         
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.agente=' . $agente . ' and evento.sector=' . $sector . ' and evento.estatus=' . $estatus;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                             <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="19"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteSectorEstatusFecha() {
+
+        $agente = $this->input->get('agente');
+        $estatus = $this->input->get('estatus');
+        $sector = $this->input->get('sector');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $nagente = $this->input->get('nagente');
+        $nestatus = $this->input->get('nestatus');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                       
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                        
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($fecha)) . '</b></p></td>
+                         
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.agente=' . $agente . ' and evento.sector=' . $sector . ' and evento.estatus=' . $estatus . ' and evento.fechatope="' . $fecha . '"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                             <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                                  <td colspan="5"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="27"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteAlcanceEstatusFecha() {
+        $alcance = $this->input->get('alcance');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+        $agente = $this->input->get('agente');
+        $estatus = $this->input->get('estatus');
+
+
+        $nalcance = $this->input->get('nalcance');
+        $nagente = $this->input->get('nagente');
+        $nestatus = $this->input->get('nestatus');
+
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                       
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                       
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($fecha)) . '</b></p></td> 
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.agente=' . $agente . ' and evento.fechatope="' . $fecha . '" and evento.estatus=' . $estatus;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                          <td colspan="5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="27"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteAlcanceSectorFecha() {
+        $alcance = $this->input->get('alcance');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+        $agente = $this->input->get('agente');
+        $sector = $this->input->get('sector');
+
+        $nalcance = $this->input->get('nalcance');
+        $nagente = $this->input->get('nagente');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                       
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nalcance . '</b></p></td>
+                        
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($fecha)) . '</b></p></td> 
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.agente=' . $agente . ' and evento.fechatope="' . $fecha . '" and evento.sector=' . $sector;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                             <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                                  <td colspan="5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="27"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteAlcanceSector() {
+        $alcance = $this->input->get('alcance');
+        $agente = $this->input->get('agente');
+        $sector = $this->input->get('sector');
+
+        $nalcance = $this->input->get('nalcance');
+        $nagente = $this->input->get('nagente');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nalcance . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.agente=' . $agente . ' and evento.sector=' . $sector;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="24"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteAlcanceFecha() {
+        $alcance = $this->input->get('alcance');
+        $agente = $this->input->get('agente');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $nalcance = $this->input->get('nalcance');
+        $nagente = $this->input->get('nagente');
+
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nalcance . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.agente=' . $agente . ' and evento.fechatope="' . $fecha . '"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="29"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteAlcanceEstatus() {
+        $alcance = $this->input->get('alcance');
+        $agente = $this->input->get('agente');
+        $sector = $this->input->get('estatus');
+
+        $nalcance = $this->input->get('nalcance');
+        $nagente = $this->input->get('nagente');
+        $nsector = $this->input->get('nestatus');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nalcance . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.agente=' . $agente . ' and evento.estatus=' . $sector;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="24"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteSectorEstatus() {
+        $estatus = $this->input->get('estatus');
+        $agente = $this->input->get('agente');
+        $sector = $this->input->get('sector');
+
+        $nestatus = $this->input->get('nestatus');
+        $nagente = $this->input->get('nagente');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.agente=' . $agente . ' and evento.estatus=' . $estatus;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="24"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteSectorFecha() {
+
+        $agente = $this->input->get('agente');
+        $sector = $this->input->get('sector');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $nagente = $this->input->get('nagente');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.agente=' . $agente . ' and evento.fechatope="' . $fecha . '"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="24"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAgenteEstatusFecha() {
+
+        $agente = $this->input->get('agente');
+        $estatus = $this->input->get('estatus');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $nagente = $this->input->get('nagente');
+        $nestatus = $this->input->get('nestatus');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nagente . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.agente=' . $agente . ' and evento.fechatope="' . $fecha . '"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="29"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    //====================================Reportes con Alcance Seleccionado===========================================================================================
+
+
+    public function generarReporteEventoGeneralSeleccionAlcance() {
+
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                         <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="19"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con el alcance seleccionado.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAlcanceSectorEstatus() {
+        $estatus = $this->input->get('estatus');
+        $alcance = $this->input->get('alcance');
+        $sector = $this->input->get('sector');
+
+        $nestatus = $this->input->get('nestatus');
+        $nalcance = $this->input->get('nalcance');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.alcance=' . $alcance . ' and evento.estatus=' . $estatus;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['agente'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="24"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAlcanceSectorFecha() {
+
+        $alcance = $this->input->get('alcance');
+        $sector = $this->input->get('sector');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $nalcance = $this->input->get('nalcance');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.alcance=' . $alcance . ' and evento.fechatope="' . $fecha . '"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['agente'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="24"><p align="right"> Cantidad de Eventos:  </p></td>
+                          <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAlcanceSectorEstatusFecha() {
+
+        $alcance = $this->input->get('alcance');
+        $estatus = $this->input->get('estatus');
+        $sector = $this->input->get('sector');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $nalcance = $this->input->get('nalcance');
+        $nestatus = $this->input->get('nestatus');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                       
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                        
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($fecha)) . '</b></p></td>
+                         
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.sector=' . $sector . ' and evento.estatus=' . $estatus . ' and evento.fechatope="' . $fecha . '"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                             <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                                  <td colspan="5"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="24"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAlcanceSector() {
+
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAlcanceEstatus() {
+
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                       <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAlcanceFecha() {
+
+        $alcance = $this->input->get('alcance');
+        $nalcance = $this->input->get('nalcance');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Alcance </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("d-m-Y", strtotime($fecha)) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.fechatope="' . $fecha . '" and evento.alcance=' . $alcance;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="19"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionAlcanceEstatusFecha() {
+
+        $alcance = $this->input->get('alcance');
+        $estatus = $this->input->get('estatus');
+
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $nalcance = $this->input->get('nalcance');
+        $nestatus = $this->input->get('nestatus');
+
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                      
+                       
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                        
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nalcance . '</b></p></td>
+                                                  
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($fecha)) . '</b></p></td>
+                         
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.alcance=' . $alcance . ' and evento.estatus=' . $estatus . ' and evento.fechatope="' . $fecha . '"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="24"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    //====================================Reportes con Sector Seleccionado===========================================================================================
+
+
+    public function generarReporteEventoGeneralSeleccionSector() {
+
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                         <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="19"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con el sector seleccionado.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionSectorEstatus() {
+
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus . ' and evento.sector=' . $sector;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                       <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionSectorFecha() {
+
+        $sector = $this->input->get('sector');
+        $nsector = $this->input->get('nsector');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Sector </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nsector . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("d-m-Y", strtotime($fecha)) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.fechatope="' . $fecha . '" and evento.sector=' . $sector;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="19"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionSectorEstatusFecha() {
+
+
+        $estatus = $this->input->get('estatus');
+        $sector = $this->input->get('sector');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+
+        $nestatus = $this->input->get('nestatus');
+        $nsector = $this->input->get('nsector');
+
+
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+
+                    </tr>
+              
+                       
+                 
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1" >
+                   
+                    <tr colspan="1"  width="5" heigth="5">
+                       
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                       
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                         <td colspan="1" bgColor="#429DED"><p align="center"><b>Fecha</b></p></td>
+                        
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">
+
+                        
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nsector . '</b></p></td>                           
+                        <td colspan="1" bgColor=""><p align="center"><b>' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b>' . date("d-m-Y", strtotime($fecha)) . '</b></p></td>
+                         
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.sector=' . $sector . ' and evento.estatus=' . $estatus . ' and evento.fechatope="' . $fecha . '"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="2">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="16" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                         <td colspan="5" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="2">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="16"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                             <td colspan="5"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                                  <td colspan="5"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="24"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    //=========================================Estatus===============================================================================
+    public function generarReporteEventoGeneralSeleccionEstatus() {
+
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.estatus=' . $estatus;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                         <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="19"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con el sector seleccionado.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    public function generarReporteEventoGeneralSeleccionEstatusFecha() {
+
+        $estatus = $this->input->get('estatus');
+        $nestatus = $this->input->get('nestatus');
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Estatus </b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . $nestatus . '</b></p></td>
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("d-m-Y", strtotime($fecha)) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.fechatope="' . $fecha . '" and evento.estatus=' . $estatus;
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['sector'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="19"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados con las características indicadas.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
+    //======================================Fecha seleccionada====================================
+
+
+    public function generarReporteEventoGeneralSeleccionFecha() {
+
+        $fecha = date("Y-m-d", strtotime($this->input->get('fecha')));
+
+        $pdf = new Pdf('L', 'mm', 'Legal', true, 'UTF-8', false);
+        $pdf->setPageOrientation('l');
+        $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+        $pdf->SetMargins(PDF_MARGIN_LEFT, 15, PDF_MARGIN_RIGHT);
+        //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        //$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING, array(0, 64, 255), array(0, 64, 128));
+        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->setFontSubsetting(true);
+        $pdf->SetFont('times', '', 12, '', true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->AddPage();
+        $html = null;
+        $pdf->SetFont('Times', 'B', 14);
+        $pdf->Image("imagen/logo/bannerprevengo2.png", $x = 5, $y = 5, $w = 290, $h = 40, $type = 'PNG', $link = '', $align = 'right', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+        $pdf->SetTextColor('0', '25', '215');
+        $pdf->Text(130, 12, "República Bolivariana de Venezuela", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 17, "Gobernación del Estado Lara", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->Text(130, 23, "Oficina de Personal--División de Planificación y Presupuesto.", $fstroke = false, $fclip = false, $ffill = true, $border = 0, $ln = 0, $align = 'left', $fill = false, $link = '', $stretch = 0, $ignore_min_height = false, $calign = 'T', $valign = 'M', $rtloff = false);
+        $pdf->SetFont('Times', 'B', 12);
+        $pdf->SetTextColor('8', '8', '8');
+        // $pdf->Text(50, 35, 'Reporte General de Eventos.');
+        // $pdf->Ln(20);
+        //$pdf->Text(30, 40, 'Fecha:' . date('d-m-Y'),  $align = 'rigth');
+        $pdf->Ln(15);
+        $pdf->SetFont('times', '', 11, '', true);
+        $ano = date('Y');
+        $mesesN = array(1 => "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+        $mes = $mesesN[date('n')];
+        $dia = date('d');
+
+        $html .='
+                    <table>
+                   
+                    <tr colspan="8">
+                        <td colspan="2"><p align="center"><b></b></p></td>
+                        <td colspan="2" ><p align="center"><b></b></p></td>
+                        <td colspan="2"><p align="center"><b>Barquisimeto, ' . $dia . ' de ' . $mes . ' del ' . $ano . '</b></p></td>
+                    </tr>
+                    </table>';
+
+
+        $html .="<h1>Reporte General de Eventos con  las siguientes caracteristicas: </h1>";
+        $html .='
+                    <table border="1">
+                    <tr colspan="1"  width="5" heigth="5">
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b> Fecha </b></p></td>
+                    </tr>
+                      <tr colspan="1"  width="5" heigth="5">    
+                        <td colspan="1" bgColor=""><p align="center"><b> ' . date("Y-m-d", strtotime($this->input->get('fecha'))) . '</b></p></td>
+                    </tr>
+                     
+                    </table>';
+
+        $condicion = 'evento.fechatope="' . $fecha . '"';
+        $reporte = $this->evento_model->cargarListaEventoSeleccionPDF($condicion);
+        $html .="<H1></h1>";
+
+        if ($reporte->num_rows() > 0) {
+            $html .='
+                    <table border="1">
+                   
+                    <tr colspan="8">
+                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Tipo de Evento</b></p></td>
+                         <td colspan="2" bgColor="#429DED"><p align="center"><b>Sector</b></p></td>
+                          <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente</b></p></td>
+                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        
+                    </tr>';
+
+            foreach ($reporte->result_array() as $fila2) {
+                $html .='<tr colspan="8">
+                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['tipoEv'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['sector'] . '</p></td>
+                                 <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            
+                        </tr>';
+            }
+            $html .='<tr>
+                         <td colspan="21"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
+                        </tr>
+                    </table>';
+        } else {
+
+            $html.='<h1>No se encuentra eventos registrados para la fecha seleccionada.</h1>';
+        }
+        $nombre_archivo = utf8_decode("reporteEventos.pdf");
+        $pdf->writeHTMLCell($w = 0, $h = 0, $x = '', $y = '', $html, $border = 0, $ln = 1, $fill = 0, $reseth = true, $align = 'C', $autopadding = true);
+        $pdf->Output($nombre_archivo, 'I');
+    }
+
 }
