@@ -128,9 +128,8 @@ Ext.define('myapp.controller.actividad.ListaPlanEventoAsignarEjecutorController'
         
         arregloItems = Ext.encode(arregloGrid);
         if (records[0]) {
-
             store = grid1.getStore();
-
+            console.log(store);
             if (store.data.items.length == 0) {
                 encontrado = false;
             }

@@ -141,6 +141,27 @@ class Avance_model extends CI_Model {
 
         return $query;
     }
+    
+    public function consultarListaAvanceActividad($id) {
+
+        $sql = "SELECT av.id AS idAv,
+                     av.descripcion AS descripcion, 
+                     if (av.tipo=1,'PARCIAL', 'FINAL') AS tipo, 
+                     concat(av.meta,' ', ac.medida) meta,
+                     concat(p.nombre,' ', p.apellido) as ejecutor,
+                     av.fecharegistro AS fecha, av.estatus
+             FROM prevengo.avance AS av 
+              INNER JOIN bdgenerica.usuario u on u.id=av.usuario
+              INNER JOIN bdgenerica.persona p on p.cedula= u.cedula
+              INNER JOIN actividad ac on ac.id=av.actividad
+             Where av.actividad=$id and av.estatus=0";
+
+        $query = $this->db->query($sql);
+
+        return $query;
+    }
+    
+    
 
     public function cargarEmpleadosConPlan($id) {
 
@@ -171,7 +192,7 @@ class Avance_model extends CI_Model {
 
 
         $sql = "SELECT bdgenerica.usuario.id,
-	                    bdgenerica.usuario.nacionalidad,
+	               bdgenerica.usuario.nacionalidad,
                         bdgenerica.usuario.cedula,
                         bdgenerica.empleado.id as empl,
                         bdgenerica.persona.foto,
@@ -181,10 +202,10 @@ class Avance_model extends CI_Model {
                         bdgenerica.ente.nombre AS ente,
                         bdgenerica.division.nombre AS division,
                         bdgenerica.tipousuario.nombre AS tipousuario
-
+                        
                      FROM bdgenerica.usuario
-
-                     INNER JOIN bdgenerica.persona 
+                     
+                     INNER  JOIN bdgenerica.persona 
                       ON bdgenerica.persona.cedula= bdgenerica.usuario.cedula
                      INNER JOIN  bdgenerica.empleado
                        ON bdgenerica.persona.cedula=bdgenerica.empleado.cedula 

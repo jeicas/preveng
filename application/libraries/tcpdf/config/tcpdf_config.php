@@ -141,14 +141,14 @@ if (!defined('K_TCPDF_EXTERNAL_CONFIG')) {
 	/**
 	 * image logo
 	 */
-	define ('PDF_HEADER_LOGO', 'lara.png');
+	define ('PDF_HEADER_LOGO', 'bannerprevengo2.png');
 	define ('PDF_HEADER_LOGO1', 'ceapdis.png');
 
 	/**
 	 * header logo image width [mm]
 	 */
-	define ('PDF_HEADER_LOGO_WIDTH', 50);
-	define ('PDF_HEADER_LOGO_WIDTH1', 50);
+	define ('PDF_HEADER_LOGO_WIDTH', '300%');
+	define ('PDF_HEADER_LOGO_WIDTH1', 200);
 
 	/**
 	 *  document unit of measure [pt=point, mm=millimeter, cm=centimeter, in=inch]

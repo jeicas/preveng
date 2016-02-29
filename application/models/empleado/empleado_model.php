@@ -368,7 +368,7 @@
 
      public function buscarDivisionUsuario($cedula,$nacionalidad){
         $db_generica = $this->load->database('bdgenerica', TRUE);//Inicia la BD generica
-        $sql= "SELECT usuario.cedula, usuario.nacionalidad, empleado.division, division.id, division.nombre
+        $sql= "SELECT usuario.cedula, usuario.nacionalidad, empleado.division,empleado.ente , division.id, division.nombre
         FROM usuario, empleado, division
         WHERE usuario.cedula=? 
         AND usuario.nacionalidad=? 

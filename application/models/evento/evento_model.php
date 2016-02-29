@@ -169,6 +169,28 @@ class Evento_model extends CI_Model {
        
         return $query;
     }
+      public function getDatosEventoPDF($id) {
+        $query = $this->db->query("SELECT e.titulo,
+                                          e.descripcion, 
+                                          a.nombre agente, 
+                                          te.nombre tipoEv, 
+                                          s.nombre sector, 
+                                          al.nombre alcance, 
+                                          CASE evento.estatus   WHEN 0 THEN 'COMPLETADO'
+                                  WHEN 1 THEN 'PENDIENTE'
+                                  WHEN 2 THEN 'EN EJECUCION'
+                                  WHEN 3 THEN 'CANCELADO'  
+                                  WHEN 4 THEN 'SIN PLAN' 
+                                  WHEN 5 THEN 'EXPIRADO' END as estatus
+                             from evento e
+                              inner join agente a on a.id=e.agente
+                             inner join alcance on al al.id=e.alcance
+                             inner join tipoevento te on te.id=e.tipoevento
+                             inner join sector s on s.id=e.sector
+                             where id=$id");
+       
+        return $query;
+    }
     
     
     

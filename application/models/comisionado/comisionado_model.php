@@ -31,7 +31,30 @@ class Comisionado_model extends CI_Model {
             
        }
        
-        
+        public function cargarListaComisionadoPDF($id) {
+
+        $query = $this->db->query("select prevengo.comisionado.id as idCom,
+                                   prevengo.comisionado.empleado as idEmpl,
+                                    prevengo.comisionado.evento AS idEv,
+                                    concat(bdgenerica.persona.nombre, ' ',  bdgenerica.persona.apellido)as nombrecompleto,
+                                    bdgenerica.persona.foto as foto,
+                                    bdgenerica.cargo.nombre as cargo,
+                                    prevengo.comisionado.estatus as estatus
+                                    from prevengo.comisionado 
+                                    inner join bdgenerica.empleado
+                                      on prevengo.comisionado.empleado= bdgenerica.empleado.id
+                                    inner join bdgenerica.cargo 
+                                      on  bdgenerica.empleado.cargo=bdgenerica.cargo.id
+                                    inner join bdgenerica.persona
+                                        on bdgenerica.persona.cedula= bdgenerica.empleado.cedula
+                                    where  prevengo.comisionado.evento=$id and 					 												   
+                                           prevengo.comisionado.estatus=1
+                                 ");
+       
+            return $query;
+            
+       }
+       
 
  
       public function  guardarComisionado($data){         

@@ -635,7 +635,7 @@ class Avance extends CI_Controller {
                     'foto' => $row['foto'],
                     'nombrecompleto' => $row['nombre'] . " " . $row['apellido'],
                     'ente' => $row['ente'],
-                      'correo' => $row['correo'],
+                    'correo' => $row['correo'],
                     'division' => $row['division'],
                     'tipousuario' => $row['tipousuario'],
                 );

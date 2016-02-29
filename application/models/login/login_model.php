@@ -21,9 +21,11 @@
      $db_generica->where('estatus', 1);
      $db_generica->limit(1);
     $query =  $db_generica->get('usuario');*/
-      $sql="SELECT u.id, u.usuario, u.cedula, u.nacionalidad, tu.nombre as tipou, concat(p.nombre,' ', p.apellido) as nombre 
+      $sql="SELECT u.id, u.usuario, u.cedula, u.nacionalidad, 
+                   tu.nombre as tipou, concat(p.nombre,' ', p.apellido) as nombre, e.ente as ente 
                   FROM bdgenerica.usuario u  INNER JOIN bdgenerica.tipousuario tu on u.tipousuario=tu.id
                   INNER JOIN bdgenerica.persona p on p.cedula=u.cedula
+                  INNER JOIN bdgenerica.empleado e on e.cedula=u.cedula 
                   WHERE u.usuario='".$usuario."' AND clave='".$contrasena."' and u.estatus=1 LIMIT 1";
     
       $query = $this->db->query($sql);

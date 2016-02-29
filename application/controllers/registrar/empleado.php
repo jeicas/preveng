@@ -302,6 +302,7 @@ class Empleado extends CI_Controller {
             );
         }
         $divison3 = $row5['division'];
+        $ente = $row5['ente'];
 
         //echo json_encode($departamento3);
         // $departa=$this->empleado_model->buscarDepartamentoEmpleado($cedula,$nacionalidad);
@@ -321,6 +322,7 @@ class Empleado extends CI_Controller {
             'tiponomina' => $this->input->post('cmbtiponomina'),
             'cargo' => $cargo,
             'division' => $this->input->post('division'), //Ahora es division
+            'ente' => $ente, 
             'fechaingreso' => $this->input->post('fechaingreso'),
             'estatus' => $status,
             

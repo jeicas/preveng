@@ -39,6 +39,7 @@ class Login extends CI_Controller {
           'usuario_id'  => $_POST['user'],
           'password'=> $_POST['pass'],
           'nacionalidad' => $row['nacionalidad'],
+          'enteid'=> $row['ente'],
           'nombre' => $row['nombre']);
           //Esta validacion es solo por el registro, al desarrollar los demas modulos debe revisarse
           if ($datasession['login_ok']==TRUE) {

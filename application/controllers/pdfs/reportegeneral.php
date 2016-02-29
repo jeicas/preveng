@@ -400,27 +400,27 @@ class Reportegeneral extends CI_Controller {
                     <table border="1">
                    
                     <tr colspan="8">
-                        <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
-                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
-                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Agente Emisor</b></p></td>
-                        <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
-                        <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
+                        <td colspan="5" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Agente Emisor</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
+                        <td colspan="1.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
                         
                     </tr>';
 
             foreach ($reporte->result_array() as $fila2) {
                 $html .='<tr colspan="8">
-                            <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
-                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
-                            <td colspan="2"><p align="center">' . $fila2['agente'] . '</p></td>
-                            <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
-                            <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
+                            <td colspan="1"><p align="center">' . $fila2['titulo'] . '</p></td>
+                            <td colspan="5"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="1"><p align="center">' . $fila2['agente'] . '</p></td>
+                            <td colspan="1"><p align="center">' . $fila2['alcance'] . '</p></td>
+                            <td colspan="1.5"><p align="center">' . $fila2['estatus'] . '</p></td>
                             
                         </tr>';
             }
             $html .='<tr>
-                         <td colspan="17"><p align="right"> Cantidad de Eventos:  </p></td>
-                         <td colspan="5"><p align="center">' . $reporte->num_rows() . '</p></td>
+                         <td colspan="8"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="1.5"><p align="center">' . $reporte->num_rows() . '</p></td>
                         </tr>
                     </table>';
         } else {
@@ -937,7 +937,7 @@ class Reportegeneral extends CI_Controller {
                    
                     <tr colspan="8">
                         <td colspan="3" bgColor="#429DED"><p align="center"><b>Titulo</b></p></td>
-                        <td colspan="10" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
+                        <td colspan="1" bgColor="#429DED"><p align="center"><b>Descripción</b></p></td>
                         <td colspan="2" bgColor="#429DED"><p align="center"><b>Alcance</b></p></td>
                         <td colspan="2.5" bgColor="#429DED"><p align="center"><b>Estatus</b></p></td>
                         
@@ -946,14 +946,14 @@ class Reportegeneral extends CI_Controller {
             foreach ($reporte->result_array() as $fila2) {
                 $html .='<tr colspan="8">
                             <td colspan="3"><p align="center">' . $fila2['titulo'] . '</p></td>
-                            <td colspan="10"><p align="center">' . $fila2['descripcion'] . '</p></td>
+                            <td colspan="1"><p align="center">' . $fila2['descripcion'] . '</p></td>
                             <td colspan="2"><p align="center">' . $fila2['alcance'] . '</p></td>
                             <td colspan="2.5"><p align="center">' . $fila2['estatus'] . '</p></td>
                             
                         </tr>';
             }
             $html .='<tr>
-                         <td colspan="15"><p align="right"> Cantidad de Eventos:  </p></td>
+                         <td colspan="5"><p align="right"> Cantidad de Eventos:  </p></td>
                          <td colspan="2"><p align="center">' . $reporte->num_rows() . '</p></td>
                         </tr>
                     </table>';

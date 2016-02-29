@@ -44,7 +44,7 @@ class Actividad_model extends CI_Model {
               FROM avance AS ava 
               INNER JOIN actividad AS act ON ava.actividad=act.id 
               WHERE ava.usuario=$idUsuario and ava.actividad=$idActividad group by act.id";
-         
+
         $query = $this->db->query($sql);
         return $query;
     }
@@ -179,33 +179,95 @@ class Actividad_model extends CI_Model {
     public function cargarPlandeAccionDeEvento($id) {
 
         $sql = " SELECT ac.id AS id,
-                    ac.descripcion AS descripcion, 
-                     ac.fechatope AS fecha,
-                     ac.fechaaviso AS fechaPA,
-                      ac.meta AS meta,
-                     ac.medida AS medida,
-                     actividad.descripcion AS depende,
-                      ac.actividadepende AS iddepende,
-                     ac.observacion as observacion,
-                     ac.estatus AS estatus, 
-                     concat (p.nombre, ' ',p.apellido) AS nombrecompleto, 
-                     p.foto, 
-                     p.correo, 
-                     concat (p.nacionalidad, '-',p.cedula) AS cedula, 
-                     us.id as usuario, 
-                     ac.responsable as responsable
-                
-                FROM actividad AS ac 
-                LEFT JOIN actividad ON actividad.id=ac.actividadepende
-                LEFT JOIN actividad_usuario au ON ac.id=au.actividad
-                LEFT JOIN bdgenerica.usuario as us on us.id= au.usuario    
-                LEFT JOIN bdgenerica.persona as p on us.cedula= p.cedula
-                WHERE  ac.evento=$id   GROUP BY ac.id";
+          ac.descripcion AS descripcion,
+          ac.fechatope AS fecha,
+          ac.fechaaviso AS fechaPA,
+          ac.meta AS meta,
+          ac.medida AS medida,
+          concat(ac.meta, ' ',  ac.medida) metaM,
+          actividad.descripcion AS depende,
+          ac.actividadepende AS iddepende,
+          ac.observacion as observacion,
+          ac.estatus AS estatus,
+          concat (p.nombre, ' ',p.apellido) AS nombrecompleto,
+          p.foto,
+          p.correo,
+          concat (p.nacionalidad, '-',p.cedula) AS cedula,
+          us.id as usuario,
+          ac.responsable as responsable
+
+          FROM actividad AS ac
+          LEFT JOIN actividad ON actividad.id=ac.actividadepende
+          LEFT JOIN actividad_usuario au ON ac.id=au.actividad
+          LEFT JOIN bdgenerica.usuario as us on us.id= au.usuario
+          LEFT JOIN bdgenerica.persona as p on us.cedula= p.cedula
+          WHERE  ac.evento=$id   GROUP BY ac.id"; 
+
 
         $query = $this->db->query($sql);
 
         return $query;
     }
+        public function cargarPlandeAccionDeEventoPDF($id) {
+
+        $sql = " SELECT ac.id AS id,
+          ac.descripcion AS descripcion,
+          ac.fechatope AS fecha,
+          ac.fechaaviso AS fechaPA,
+          ac.meta AS meta,
+          ac.medida AS medida,
+          concat(ac.meta, ' ',  ac.medida) metaM,
+          actividad.descripcion AS depende,
+          ac.actividadepende AS iddepende,
+          ac.observacion as observacion,
+          CASE  ac.estatus   WHEN 0 THEN 'COMPLETADO'
+                                  WHEN 1 THEN 'PENDIENTE'
+                                  WHEN 2 THEN 'EN EJECUCION'
+                                  WHEN 3 THEN 'CANCELADO'  
+                                  WHEN 4 THEN 'SIN PLAN' 
+                                  WHEN 5 THEN 'EXPIRADO' END as estatus,
+          concat (p.nombre, ' ',p.apellido) AS nombrecompleto,
+          p.foto,
+          p.correo,
+          concat (p.nacionalidad, '-',p.cedula) AS cedula,
+          us.id as usuario,
+          ac.responsable as responsable
+
+          FROM actividad AS ac
+          LEFT JOIN actividad ON actividad.id=ac.actividadepende
+          LEFT JOIN actividad_usuario au ON ac.id=au.actividad
+          LEFT JOIN bdgenerica.usuario as us on us.id= au.usuario
+          LEFT JOIN bdgenerica.persona as p on us.cedula= p.cedula
+          WHERE  ac.evento=$id   GROUP BY ac.id"; 
+
+
+        $query = $this->db->query($sql);
+
+        return $query;
+    }
+  public function cargarMetaPlandeAccionDeEventoPDF($id) {
+
+        $sql = " SELECT SUM( av.meta ) metaa, 
+                        ac.descripcion, 
+                        CONCAT( ac.meta,  ' ', ac.medida ) metap,
+                        CASE  ac.estatus   WHEN 0 THEN 'COMPLETADO'
+                                  WHEN 1 THEN 'PENDIENTE'
+                                  WHEN 2 THEN 'EN EJECUCION'
+                                  WHEN 3 THEN 'CANCELADO'  
+                                  WHEN 4 THEN 'SIN PLAN' 
+                                  WHEN 5 THEN 'EXPIRADO' END as estatus
+                    FROM avance av
+                    INNER JOIN actividad ac ON ac.id = av.actividad
+                    WHERE ac.evento =$id
+                    AND av.estatus =0
+                    GROUP BY ac.descripcion"; 
+
+              
+        $query = $this->db->query($sql);
+
+        return $query;
+    }
+
 
     public function cargarActividadDependiente($id) {
 
@@ -328,6 +390,24 @@ class Actividad_model extends CI_Model {
                                     INNER JOIN bdgenerica.persona p ON p.cedula=u.cedula
                                     INNER JOIN actividad ON au.actividad=actividad.id and actividad.evento=$id";
         $query = $this->db->query($sql);
+        return $query;
+    }
+        public function consultarListaAvanceActividad($id) {
+
+        $sql = "SELECT av.id AS idAv,
+                     av.descripcion AS descripcion, 
+                     if (av.tipo=1,'PARCIAL', 'FINAL') AS tipo, 
+                     concat(av.meta,' ', ac.medida) meta,
+                     concat(p.nombre,' ', p.apellido) as ejecutor,
+                     av.fecharegistro AS fecha, av.estatus
+             FROM prevengo.avance AS av 
+              INNER JOIN bdgenerica.usuario u on u.id=av.usuario
+              INNER JOIN bdgenerica.persona p on p.cedula= u.cedula
+              INNER JOIN actividad ac on ac.id=av.actividad
+             Where av.actividad=$id and av.estatus=0";
+        //print_r($sql);
+        $query = $this->db->query($sql);
+
         return $query;
     }
 

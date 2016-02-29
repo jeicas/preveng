@@ -17,7 +17,7 @@ Ext.define('myapp.view.evento.ListaLineamientoPorEvento', {
         me.dockedItems = me.buildDockedItems();
         me.callParent();
     },
-    plugins: [{
+  /*  plugins: [{
             ptype: 'rowexpander',
             rowBodyTpl : new Ext.XTemplate(
                 '<p><b>Company:</b> </p>',
@@ -28,8 +28,8 @@ Ext.define('myapp.view.evento.ListaLineamientoPorEvento', {
                     var color = v >= 0 ? 'green' : 'red';
                     return '<span style="color: ' + color + ';">' + Ext.util.Format.usMoney(v) + '</span>';
                 }*/
-            })
-        }],
+           /* })
+        }],*/
         collapsible: true,
     buildColumns: function () {
         return [   {
